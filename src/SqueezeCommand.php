@@ -30,10 +30,23 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 
 class SqueezeCommand extends Command
 {
     const EXIT_SUCCESS = 0, EXIT_VIOLATION = 1;
+
+    /** @var Finder */
+    private $finder;
+
+    /**
+     * @param Finder $finder
+     */
+    public function __construct(Finder $finder)
+    {
+        $this->finder = $finder;
+    }
+
 
     protected function configure()
     {
@@ -46,6 +59,16 @@ class SqueezeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getDescription() . PHP_EOL);
+
+        $this->finder
+            ->files()
+            ->name($this->getConfig()->getFilePattern())
+            ->in($this->getConfig()->getSource());
+
+        foreach ($this->finder->getIterator() as $file) {
+            /** @var \Symfony\Component\Finder\SplFileInfo $file */
+
+        }
 
         //return self::EXIT_SUCCESS;
         //return self::EXIT_VIOLATION;
