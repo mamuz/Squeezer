@@ -20,9 +20,9 @@ Use PSR-2:
 
 ## License
 
-This project is under [MIT License](https://github.com/mamuz/squeezer/blob/master/LICENSE).
+This project is under [MIT License](https://github.com/mamuz/Squeezer/blob/master/LICENSE).
 Every file that contains PHP code must have a docblock at the top of the file
-that contains the [license](https://github.com/mamuz/squeezer/blob/master/LICENSE) at a minimum.
+that contains the [license](https://github.com/mamuz/Squeezer/blob/master/LICENSE) at a minimum.
 
 Check [this](http://choosealicense.com/licenses/mit) for more informations about MIT License.
 
@@ -46,6 +46,6 @@ So be sure that your code is (nearly) [SOLID and not STUPID](http://williamduran
 
 ## Reporting Bugs
 
-Issues can be reported on the [issue tracker](https://github.com/mamuz/squeezer/issues).
+Issues can be reported on the [issue tracker](https://github.com/mamuz/Squeezer/issues).
 Please try and report any bugs with a minimal reproducible example,
 it will make things easier for other contributors and your problems will hopefully be resolved quickly.

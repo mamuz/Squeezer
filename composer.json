@@ -2,7 +2,7 @@
     "name"             : "mamuz/squeezer",
     "type"             : "project",
     "description"      : "",
-    "homepage"         : "https://github.com/mamuz/squeezer",
+    "homepage"         : "https://github.com/mamuz/Squeezer",
     "license"          : "MIT",
     "keywords"         : [],
     "authors"          : [
@@ -12,8 +12,8 @@
         }
     ],
     "support"          : {
-        "issues": "https://github.com/mamuz/squeezer/issues",
-        "source": "https://github.com/mamuz/squeezer"
+        "issues": "https://github.com/mamuz/Squeezer/issues",
+        "source": "https://github.com/mamuz/Squeezer"
     },
     "minimum-stability": "dev",
     "prefer-stable"    : true,
