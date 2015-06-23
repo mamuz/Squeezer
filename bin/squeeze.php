@@ -33,5 +33,5 @@ if (!($loader = @include_once __DIR__ . '/../vendor/autoload.php')
     throw new \RuntimeException('Cannot find vendor/autoload.php');
 }
 
-$appFactory = new Squeeze\Command\ApplicationFactory;
+$appFactory = new Squeeze\ApplicationFactory;
 $appFactory->create($loader)->run();
