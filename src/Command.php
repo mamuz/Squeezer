@@ -26,13 +26,13 @@
 namespace Squeeze;
 
 use Squeeze\MessageInterface as Message;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\Command as BaseCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-class SqueezeCommand extends Command
+class Command extends BaseCommand
 {
     const EXIT_SUCCESS = 0, EXIT_VIOLATION = 1;
 
@@ -73,7 +73,7 @@ class SqueezeCommand extends Command
     protected function configure()
     {
         $this->addOption('source', 's', InputOption::VALUE_OPTIONAL, Message::OPTION_SOURCE);
-        $this->addOption('exclude', 'i', InputOption::VALUE_OPTIONAL, Message::OPTION_IGNORE);
+        $this->addOption('exclude', 'i', InputOption::VALUE_OPTIONAL, Message::OPTION_EXCLUDE);
         $this->addOption('target', 't', InputOption::VALUE_OPTIONAL, Message::OPTION_TARGET);
     }
 

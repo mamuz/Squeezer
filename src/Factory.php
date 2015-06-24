@@ -50,7 +50,7 @@ class Factory
 
     /**
      * @param Composer $composer
-     * @return SqueezeCommand
+     * @return Command
      */
     protected function createCommand(Composer $composer)
     {
@@ -60,11 +60,11 @@ class Factory
         $loader = new Loader(
             new \PhpParser\Parser(new \PhpParser\Lexer\Emulative),
             $traverser,
-            new DependencyVisitor,
+            new Collector,
             $composer
         );
 
-        $command = new SqueezeCommand(Message::COMMAND);
+        $command = new Command(Message::COMMAND);
         $command->setHelp(Message::HELP);
         $command->setDescription(Message::NAME . ' (' . Message::VERSION . ')');
         $command->setFinder(new Finder);

@@ -28,26 +28,47 @@ namespace Squeeze;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class DependencyVisitor extends NodeVisitorAbstract
+class Collector extends NodeVisitorAbstract
 {
     /** @var array */
     private $collection = array();
 
+    /** @var array */
+    private $dependencies = array();
+
     public function leaveNode(Node $node)
     {
-        $dependencies = array();
+        $this->dependencies = array();
         if ($node instanceof Node\Stmt\Class_) {
-            $dependencies[] = '';
+            $this->collect(array($node->extends));
+            $this->collect($node->implements);
         } elseif ($node instanceof Node\Stmt\Interface_) {
-            $dependencies[] = '';
+            $this->collect($node->extends);
         } elseif ($node instanceof Node\Stmt\TraitUse) {
-            $dependencies[] = '';
-        } elseif ($node instanceof Node\Stmt\Trait_) {
-            $dependencies[] = '';
+            $this->collect($node->traits);
         }
 
         if ($node instanceof Node\Stmt\ClassLike) {
-            $this->collection[$node->name] = $dependencies;
+            if (property_exists($node, 'namespacedName')) {
+                $name = $node->namespacedName;
+                if ($name instanceof Node\Name) {
+                    $name = $name->toString();
+                }
+                $this->collection[$name] = $this->dependencies;
+            }
+        }
+    }
+
+    /**
+     * @param Node\Name[] $names
+     */
+    private function collect($names = null)
+    {
+        if ($names) {
+            foreach ($names as $name) {
+                $name = $name->toString();
+                $this->dependencies[$name] = $name;
+            }
         }
     }
 

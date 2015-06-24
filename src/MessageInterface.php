@@ -29,35 +29,19 @@ interface MessageInterface
 {
     const VERSION = 'dev-master';
 
-    const NAME = 'PhpDependencyAnalysis by Marco Muths';
+    const NAME = 'Squeezer by Marco Muths';
 
-    const COMMAND = 'analyze';
+    const COMMAND = 'squeeze';
 
-    const HELP = 'Please visit <info>https://github.com/mamuz/PhpDependencyAnalysis</info> for detailed informations.';
+    const HELP = 'Please visit <info>https://github.com/mamuz/Squeezer</info> for detailed informations.';
 
-    const ARGUMENT_CONFIG = 'Path to yaml configuration file.';
+    const OPTION_SOURCE = 'Directory to squeeze.';
 
-    const OPTION_MODE = 'Analysis mode: "usage" (default) or "call" or "inheritance"';
+    const OPTION_EXCLUDE = 'Exclude directories from source for squeeze.';
 
-    const OPTION_SOURCE = 'Directory to analyze.';
-
-    const OPTION_FILE_PATTERN = 'Pattern to match files for analysis.';
-
-    const OPTION_IGNORE = 'Exclude directories from source for analysis.';
-
-    const OPTION_FORMATTER = 'Formatter as FQCN for creating dependency graph.';
-
-    const OPTION_TARGET = 'Filepath for writing created dependency graph.';
-
-    const READ_CONFIG_FROM = 'Configuration read from ';
-
-    const WRITE_GRAPH_TO = 'Write dependency graph to ';
+    const OPTION_TARGET = 'Filepath for writing squeezed output.';
 
     const PROGRESS_DISPLAY = '%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% Memory: %memory:6s%';
-
-    const PARSE_LOGS = 'Logs:';
-
-    const NOTHING_TO_PARSE = '<error>No files found!</error>';
 
     const DONE = 'Done.';
 }

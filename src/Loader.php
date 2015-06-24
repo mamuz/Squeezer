@@ -38,30 +38,30 @@ class Loader
     /** @var NodeTraverser */
     private $traverser;
 
-    /** @var DependencyVisitor */
-    private $visitor;
+    /** @var Collector */
+    private $collector;
 
     /** @var ClassLoader */
     private $loader;
 
     /**
-     * @param ParserAbstract    $parser
-     * @param NodeTraverser     $traverser
-     * @param DependencyVisitor $visitor
-     * @param ClassLoader       $loader
+     * @param ParserAbstract      $parser
+     * @param NodeTraverser       $traverser
+     * @param Collector $collector
+     * @param ClassLoader         $loader
      */
     public function __construct(
         ParserAbstract $parser,
         NodeTraverser $traverser,
-        DependencyVisitor $visitor,
+        Collector $collector,
         ClassLoader $loader
     ) {
         $this->parser = $parser;
         $this->traverser = $traverser;
-        $this->visitor = $visitor;
+        $this->collector = $collector;
         $this->loader = $loader;
 
-        $this->traverser->addVisitor($this->visitor);
+        $this->traverser->addVisitor($this->collector);
     }
 
     /**
@@ -73,8 +73,7 @@ class Loader
             $this->traverser->traverse($stmts);
         }
 
-        $classes = $this->visitor->getCollection();
-
+        $classes = $this->collector->getCollection();
         foreach ($classes as $class => $dependencies) {
             $classIsValid = $this->validateDependencies($dependencies, $classes);
             if ($classIsValid && $includeFile = $this->loader->findFile($class)) {
