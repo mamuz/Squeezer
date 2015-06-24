@@ -25,17 +25,21 @@
 
 namespace Squeeze;
 
-use Composer\Autoload\ClassLoader;
+use Composer\Autoload\ClassLoader as Composer;
 use Squeeze\MessageInterface as Message;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Finder\Finder;
 
-class ApplicationFactory
+/**
+ * @SuppressWarnings("PMD.CouplingBetweenObjects")
+ */
+class Factory
 {
     /**
-     * @param ClassLoader $loader
+     * @param Composer $loader
      * @return Application
      */
-    public function create(ClassLoader $loader)
+    public function create(Composer $loader)
     {
         $app = new Application(Message::NAME, Message::VERSION);
         $app->setDefaultCommand(Message::COMMAND);
@@ -45,22 +49,26 @@ class ApplicationFactory
     }
 
     /**
-     * @param ClassLoader $loader
+     * @param Composer $composer
      * @return SqueezeCommand
      */
-    protected function createCommand(ClassLoader $loader)
+    protected function createCommand(Composer $composer)
     {
+        $traverser = new \PhpParser\NodeTraverser;
+        $traverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
+
         $loader = new Loader(
             new \PhpParser\Parser(new \PhpParser\Lexer\Emulative),
-            new \PhpParser\NodeTraverser,
+            $traverser,
             new DependencyVisitor,
-            $loader
+            $composer
         );
 
         $command = new SqueezeCommand(Message::COMMAND);
-
         $command->setHelp(Message::HELP);
         $command->setDescription(Message::NAME . ' (' . Message::VERSION . ')');
+        $command->setFinder(new Finder);
+        $command->setLoader($loader);
 
         return $command;
     }

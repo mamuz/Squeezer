@@ -26,7 +26,6 @@
 namespace Squeeze;
 
 use Composer\Autoload\ClassLoader;
-use PhpParser\Error;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserAbstract;
 use Symfony\Component\Finder\SplFileInfo;
@@ -62,32 +61,47 @@ class Loader
         $this->visitor = $visitor;
         $this->loader = $loader;
 
-        $this->traverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
         $this->traverser->addVisitor($this->visitor);
     }
 
-    public function traverse(SplFileInfo $file)
+    /**
+     * @param SplFileInfo $file
+     */
+    public function load(SplFileInfo $file)
     {
-        try {
-            if ($stmts = $this->parser->parse($file->getContents())) {
-                $this->traverser->traverse($stmts);
-            }
-        } catch (Error $error) {
-            //
+        if ($stmts = $this->parser->parse($file->getContents())) {
+            $this->traverser->traverse($stmts);
         }
 
         $classes = $this->visitor->getCollection();
 
         foreach ($classes as $class => $dependencies) {
-            $classIsValid = true;
-            foreach ($dependencies as $dependency) {
-                if (!$this->loader->loadClass($dependency)) {
-                    $classIsValid = false;
-                }
-            }
-            if ($classIsValid && $file = $this->loader->findFile($class)) {
-                include_once $file;
+            $classIsValid = $this->validateDependencies($dependencies, $classes);
+            if ($classIsValid && $includeFile = $this->loader->findFile($class)) {
+                include_once $includeFile;
             }
         }
+    }
+
+    /**
+     * @param array $dependencies
+     * @param array $classes
+     * @return bool
+     */
+    private function validateDependencies(array $dependencies, array $classes = array())
+    {
+        $classIsValid = true;
+        foreach ($dependencies as $dependency) {
+            if (isset($classes[$dependency])) {
+                return $this->validateDependencies($classes[$dependency]);
+            }
+            if (strpos('_', $dependency) === false && count(explode("\\", $dependency)) == 1) {
+                return true;
+            }
+            if (!$this->loader->loadClass($dependency)) {
+                $classIsValid = false;
+            }
+        }
+        return $classIsValid;
     }
 }

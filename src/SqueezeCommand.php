@@ -39,20 +39,41 @@ class SqueezeCommand extends Command
     /** @var Finder */
     private $finder;
 
+    /** @var Loader */
+    private $loader;
+
+    /** @var Writer */
+    private $writer;
+
     /**
      * @param Finder $finder
      */
-    public function __construct(Finder $finder)
+    public function setFinder(Finder $finder)
     {
         $this->finder = $finder;
+    }
+
+    /**
+     * @param Loader $loader
+     */
+    public function setLoader(Loader $loader)
+    {
+        $this->loader = $loader;
+    }
+
+    /**
+     * @param Writer $writer
+     */
+    public function setWriter(Writer $writer)
+    {
+        $this->writer = $writer;
     }
 
 
     protected function configure()
     {
         $this->addOption('source', 's', InputOption::VALUE_OPTIONAL, Message::OPTION_SOURCE);
-        $this->addOption('filePattern', 'p', InputOption::VALUE_OPTIONAL, Message::OPTION_FILE_PATTERN);
-        $this->addOption('ignore', 'i', InputOption::VALUE_OPTIONAL, Message::OPTION_IGNORE);
+        $this->addOption('exclude', 'i', InputOption::VALUE_OPTIONAL, Message::OPTION_IGNORE);
         $this->addOption('target', 't', InputOption::VALUE_OPTIONAL, Message::OPTION_TARGET);
     }
 
@@ -62,15 +83,20 @@ class SqueezeCommand extends Command
 
         $this->finder
             ->files()
-            ->name($this->getConfig()->getFilePattern())
-            ->in($this->getConfig()->getSource());
+            ->name('*.php')
+            ->in($input->getOption('source'))
+            ->exclude($input->getOption('exclude'));
 
-        foreach ($this->finder->getIterator() as $file) {
-            /** @var \Symfony\Component\Finder\SplFileInfo $file */
-
+        try {
+            foreach ($this->finder->getIterator() as $file) {
+                /** @var \Symfony\Component\Finder\SplFileInfo $file */
+                $this->loader->load($file);
+            }
+            $this->writer->write($input->getOption('target'));
+        } catch (\Exception $e) {
+            return self::EXIT_VIOLATION;
         }
 
-        //return self::EXIT_SUCCESS;
-        //return self::EXIT_VIOLATION;
+        return self::EXIT_SUCCESS;
     }
 }
