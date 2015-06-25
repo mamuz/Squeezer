@@ -77,7 +77,7 @@ class Loader
         foreach ($classes as $class => $dependencies) {
             $classIsValid = $this->validateDependencies($dependencies, $classes);
             if ($classIsValid && $includeFile = $this->loader->findFile($class)) {
-                include_once $includeFile;
+                class_exists($includeFile);
             }
         }
     }
@@ -97,7 +97,7 @@ class Loader
             if (strpos('_', $dependency) === false && count(explode("\\", $dependency)) == 1) {
                 return true;
             }
-            if (!$this->loader->loadClass($dependency)) {
+            if (!$this->loader->findFile($dependency)) {
                 $classIsValid = false;
             }
         }

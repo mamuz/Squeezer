@@ -69,6 +69,7 @@ class Factory
         $command->setDescription(Message::NAME . ' (' . Message::VERSION . ')');
         $command->setFinder(new Finder);
         $command->setLoader($loader);
+        $command->setWriter(new Writer);
 
         return $command;
     }

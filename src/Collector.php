@@ -60,14 +60,16 @@ class Collector extends NodeVisitorAbstract
     }
 
     /**
-     * @param Node\Name[] $names
+     * @param Node\Name[]|null $names
      */
-    private function collect($names = null)
+    private function collect($names)
     {
         if ($names) {
             foreach ($names as $name) {
-                $name = $name->toString();
-                $this->dependencies[$name] = $name;
+                if ($name) {
+                    $name = $name->toString();
+                    $this->dependencies[$name] = $name;
+                }
             }
         }
     }

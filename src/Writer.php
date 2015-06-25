@@ -45,7 +45,7 @@ class Writer
             if (preg_match('/^[a-z]+/', $class)
                 || false === strpos($class, "\\")
                 || 0 !== strpos($class, 'Composer')
-                || 0 !== strpos($class, 'Squeeze')
+                || 0 !== strpos($class, __NAMESPACE__)
             ) {
                 continue;
             }
@@ -77,6 +77,9 @@ class Writer
         if (strpos($content, '<<<' != false)) {
             return '';
         }
+
+        $tokens = token_get_all($content);
+        print_r($tokens);exit;
 
         $content = preg_replace('/^<\?php/', '', $content);
         $content = preg_replace('/(^namespace .*)(;)/mi', '$1 {', $content);
