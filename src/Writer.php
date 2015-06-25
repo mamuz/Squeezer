@@ -25,65 +25,104 @@
 
 namespace Squeeze;
 
+use Composer\Autoload\ClassLoader;
+use PhpParser\NodeTraverser;
+use PhpParser\ParserAbstract;
+use PhpParser\PrettyPrinter\Standard as Printer;
+use Symfony\Component\Finder\SplFileInfo;
+
 class Writer
 {
+    /** @var ParserAbstract */
+    private $parser;
+
+    /** @var NodeTraverser */
+    private $traverser;
+
+    /** @var Collector */
+    private $collector;
+
+    /** @var ClassLoader */
+    private $loader;
+
+    /** @var Printer */
+    private $printer;
+
     /** @var string */
-    private $code = "<?php\n";
+    private $target;
 
     /**
-     * @param string $filepath
+     * @param ParserAbstract $parser
+     * @param NodeTraverser  $traverser
+     * @param Printer        $printer
+     * @param Collector      $collector
+     * @param ClassLoader    $loader
      */
-    public function write($filepath)
-    {
-        $classes = array_merge(
-            get_declared_interfaces(),
-            get_declared_classes(),
-            get_declared_traits()
-        );
+    public function __construct(
+        ParserAbstract $parser,
+        NodeTraverser $traverser,
+        Printer $printer,
+        Collector $collector,
+        ClassLoader $loader
+    ) {
+        $this->parser = $parser;
+        $this->traverser = $traverser;
+        $this->printer = $printer;
+        $this->collector = $collector;
+        $this->loader = $loader;
 
-        foreach ($classes as $class) {
-            if (preg_match('/^[a-z]+/', $class)
-                || false === strpos($class, "\\")
-                || 0 !== strpos($class, 'Composer')
-                || 0 !== strpos($class, __NAMESPACE__)
-            ) {
-                continue;
-            }
-
-            $class = new \ReflectionClass($class);
-
-            if ($class->isInternal() || $class->getExtensionName()) {
-                continue;
-            }
-            $this->code .= $this->extractContentFrom($class);
-        }
-
-        file_put_contents($filepath, $this->code);
-        file_put_contents($filepath, php_strip_whitespace($filepath));
+        $this->traverser->addVisitor($this->collector);
     }
 
     /**
-     * @param \ReflectionClass $class
-     * @return string
+     * @param $target
      */
-    private function extractContentFrom(\ReflectionClass $class)
+    public function setTarget($target)
     {
-        $fileName = $class->getFileName();
-        if (false === $fileName || !file_exists($fileName)) {
-            return '';
+        $this->target = $target;
+    }
+
+    /**
+     * @param SplFileInfo $file
+     */
+    public function minify(SplFileInfo $file)
+    {
+        file_put_contents($this->target, "<?php\n");
+
+        if ($stmts = $this->parser->parse($file->getContents())) {
+            $this->traverser->traverse($stmts);
         }
 
-        $content = file_get_contents($fileName);
-        if (strpos($content, '<<<' != false)) {
-            return '';
+        $classes = $this->collector->getCollection();
+        foreach ($classes as $class => $dependencies) {
+            $classIsValid = $this->validateDependencies($dependencies, $classes);
+            if ($classIsValid && $this->loader->findFile($class)) {
+                $code = $this->printer->prettyPrintFile($stmts);
+                $code = preg_replace('/^<\?php/', '', $code);
+                file_put_contents($this->target, $code, FILE_APPEND);
+            }
         }
+    }
 
-        $tokens = token_get_all($content);
-        print_r($tokens);exit;
-
-        $content = preg_replace('/^<\?php/', '', $content);
-        $content = preg_replace('/(^namespace .*)(;)/mi', '$1 {', $content);
-
-        return $content . "\n}";
+    /**
+     * @param array $dependencies
+     * @param array $classes
+     * @return bool
+     */
+    private function validateDependencies(array $dependencies, array $classes = array())
+    {
+        $classIsValid = true;
+        foreach ($dependencies as $dependency) {
+            if (isset($classes[$dependency])) {
+                return $this->validateDependencies($classes[$dependency]);
+            }
+            if (strpos('_', $dependency) === false && count(explode("\\", $dependency)) == 1) {
+                return true;
+            }
+            if (!$this->loader->findFile($dependency)) {
+                $classIsValid = false;
+            }
+        }
+        return $classIsValid;
     }
 }

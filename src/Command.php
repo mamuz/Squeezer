@@ -39,9 +39,6 @@ class Command extends BaseCommand
     /** @var Finder */
     private $finder;
 
-    /** @var Loader */
-    private $loader;
-
     /** @var Writer */
     private $writer;
 
@@ -51,14 +48,6 @@ class Command extends BaseCommand
     public function setFinder(Finder $finder)
     {
         $this->finder = $finder;
-    }
-
-    /**
-     * @param Loader $loader
-     */
-    public function setLoader(Loader $loader)
-    {
-        $this->loader = $loader;
     }
 
     /**
@@ -80,6 +69,7 @@ class Command extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getDescription() . PHP_EOL);
+        $this->writer->setTarget($input->getOption('target'));
 
         $this->finder
             ->files()
@@ -90,9 +80,8 @@ class Command extends BaseCommand
         try {
             foreach ($this->finder->getIterator() as $file) {
                 /** @var \Symfony\Component\Finder\SplFileInfo $file */
-                $this->loader->load($file);
+                $this->writer->minify($file);
             }
-            $this->writer->write($input->getOption('target'));
         } catch (\Exception $e) {
             return self::EXIT_VIOLATION;
         }

@@ -27,56 +27,29 @@ namespace Squeeze;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node\Stmt;
 
-class Collector extends NodeVisitorAbstract
+class Converter extends NodeVisitorAbstract
 {
-    /** @var array */
-    private $collection = array();
-
-    /** @var array */
-    private $dependencies = array();
-
     public function leaveNode(Node $node)
     {
-        $this->dependencies = array();
-        if ($node instanceof Node\Stmt\Class_) {
-            $this->collect(array($node->extends));
-            $this->collect($node->implements);
-        } elseif ($node instanceof Node\Stmt\Interface_) {
-            $this->collect($node->extends);
-        } elseif ($node instanceof Node\Stmt\TraitUse) {
-            $this->collect($node->traits);
-        }
-
-        if ($node instanceof Node\Stmt\ClassLike) {
-            $name = $node->namespacedName;
-            if ($name instanceof Node\Name) {
-                $name = $name->toString();
+        if ($node instanceof Node\Name) {
+            return new Node\Name($node->toString());
+        } elseif ($node instanceof Stmt\Class_
+            || $node instanceof Stmt\Interface_
+            || $node instanceof Stmt\Function_
+        ) {
+            $node->name = $node->namespacedName->toString();
+        } elseif ($node instanceof Stmt\Const_) {
+            foreach ($node->consts as $const) {
+                $const->name = $const->namespacedName->toString();
             }
-            $this->collection[$name] = $this->dependencies;
+        } elseif ($node instanceof Stmt\Namespace_) {
+            return $node->stmts;
+        } elseif ($node instanceof Stmt\Use_) {
+            return false;
         }
-    }
 
-    /**
-     * @param Node\Name[]|null $names
-     */
-    private function collect($names)
-    {
-        if ($names) {
-            foreach ($names as $name) {
-                if ($name) {
-                    $name = $name->toString();
-                    $this->dependencies[$name] = $name;
-                }
-            }
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getCollection()
-    {
-        return $this->collection;
+        return $node;
     }
 }

@@ -56,10 +56,12 @@ class Factory
     {
         $traverser = new \PhpParser\NodeTraverser;
         $traverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
+        $traverser->addVisitor(new Converter);
 
-        $loader = new Loader(
+        $writer = new Writer(
             new \PhpParser\Parser(new \PhpParser\Lexer\Emulative),
             $traverser,
+            new \PhpParser\PrettyPrinter\Standard,
             new Collector,
             $composer
         );
@@ -68,8 +70,7 @@ class Factory
         $command->setHelp(Message::HELP);
         $command->setDescription(Message::NAME . ' (' . Message::VERSION . ')');
         $command->setFinder(new Finder);
-        $command->setLoader($loader);
-        $command->setWriter(new Writer);
+        $command->setWriter($writer);
 
         return $command;
     }
