@@ -27,6 +27,7 @@ namespace Squeeze;
 
 use Squeeze\MessageInterface as Message;
 use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -72,17 +73,20 @@ class Command extends BaseCommand
 
     protected function configure()
     {
-        $this->addOption('source', 's', InputOption::VALUE_OPTIONAL, Message::OPTION_SOURCE);
-        $this->addOption('exclude', 'i', InputOption::VALUE_OPTIONAL, Message::OPTION_EXCLUDE);
-        $this->addOption('target', 't', InputOption::VALUE_OPTIONAL, Message::OPTION_TARGET);
+        $this->addArgument('target', InputArgument::REQUIRED, Message::ARGUMENT_TARGET);
+        $this->addOption('source', 's', InputOption::VALUE_OPTIONAL, Message::OPTION_SOURCE, '.');
+        $this->addOption('exclude', 'e', InputOption::VALUE_OPTIONAL, Message::OPTION_EXCLUDE);
+
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
             $output->writeln($this->getDescription() . PHP_EOL);
-            $this->writer->setTarget($input->getOption('target'));
-            $this->finder->in($input->getOption('source'))->exclude($input->getOption('exclude'));
+            $this->writer->setTarget($input->getArgument('target'));
+            $sources = $this->createArrayBy($input->getOption('source'));
+            $excludes = $this->createArrayBy($input->getOption('exclude'));
+            $this->finder->in($sources)->exclude($excludes);
             $classMap = $this->filter->extractClassMap($this->finder);
             $this->writer->minify($classMap);
         } catch (\Exception $e) {
@@ -90,5 +94,14 @@ class Command extends BaseCommand
         }
 
         return self::EXIT_SUCCESS;
+    }
+
+    /**
+     * @param $string
+     * @return array
+     */
+    private function createArrayBy($string)
+    {
+        return array_filter(array_map('trim', explode(',', $string)));
     }
 }

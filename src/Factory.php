@@ -27,7 +27,6 @@ namespace Squeeze;
 
 use Composer\Autoload\ClassLoader as Composer;
 use Squeeze\MessageInterface as Message;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -42,7 +41,6 @@ class Factory
     public function create(Composer $loader)
     {
         $app = new Application(Message::NAME, Message::VERSION);
-        $app->setDefaultCommand(Message::COMMAND);
         $app->add($this->createCommand($loader));
 
         return $app;

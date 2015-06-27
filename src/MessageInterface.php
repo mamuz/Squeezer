@@ -35,11 +35,11 @@ interface MessageInterface
 
     const HELP = 'Please visit <info>https://github.com/mamuz/Squeezer</info> for detailed informations.';
 
-    const OPTION_SOURCE = 'Directory to squeeze.';
+    const ARGUMENT_TARGET = 'File for squeezed output';
 
-    const OPTION_EXCLUDE = 'Exclude directories from source for squeeze.';
+    const OPTION_SOURCE = 'Directory to squeeze';
 
-    const OPTION_TARGET = 'Filepath for writing squeezed output.';
+    const OPTION_EXCLUDE = 'Exclude directories from source';
 
     const PROGRESS_DISPLAY = '%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% Memory: %memory:6s%';
 
