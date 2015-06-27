@@ -39,6 +39,9 @@ class Command extends BaseCommand
     /** @var Finder */
     private $finder;
 
+    /** @var Filter */
+    private $filter;
+
     /** @var Writer */
     private $writer;
 
@@ -48,6 +51,14 @@ class Command extends BaseCommand
     public function setFinder(Finder $finder)
     {
         $this->finder = $finder;
+    }
+
+    /**
+     * @param Filter $filter
+     */
+    public function setFilter(Filter $filter)
+    {
+        $this->filter = $filter;
     }
 
     /**
@@ -68,20 +79,12 @@ class Command extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln($this->getDescription() . PHP_EOL);
-        $this->writer->setTarget($input->getOption('target'));
-
-        $this->finder
-            ->files()
-            ->name('*.php')
-            ->in($input->getOption('source'))
-            ->exclude($input->getOption('exclude'));
-
         try {
-            foreach ($this->finder->getIterator() as $file) {
-                /** @var \Symfony\Component\Finder\SplFileInfo $file */
-                $this->writer->minify($file);
-            }
+            $output->writeln($this->getDescription() . PHP_EOL);
+            $this->writer->setTarget($input->getOption('target'));
+            $this->finder->in($input->getOption('source'))->exclude($input->getOption('exclude'));
+            $classMap = $this->filter->extractClassMap($this->finder);
+            $this->writer->minify($classMap);
         } catch (\Exception $e) {
             return self::EXIT_VIOLATION;
         }

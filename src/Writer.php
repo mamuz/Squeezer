@@ -25,11 +25,9 @@
 
 namespace Squeeze;
 
-use Composer\Autoload\ClassLoader;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserAbstract;
 use PhpParser\PrettyPrinter\Standard as Printer;
-use Symfony\Component\Finder\SplFileInfo;
 
 class Writer
 {
@@ -38,12 +36,6 @@ class Writer
 
     /** @var NodeTraverser */
     private $traverser;
-
-    /** @var Collector */
-    private $collector;
-
-    /** @var ClassLoader */
-    private $loader;
 
     /** @var Printer */
     private $printer;
@@ -55,23 +47,15 @@ class Writer
      * @param ParserAbstract $parser
      * @param NodeTraverser  $traverser
      * @param Printer        $printer
-     * @param Collector      $collector
-     * @param ClassLoader    $loader
      */
     public function __construct(
         ParserAbstract $parser,
         NodeTraverser $traverser,
-        Printer $printer,
-        Collector $collector,
-        ClassLoader $loader
+        Printer $printer
     ) {
         $this->parser = $parser;
         $this->traverser = $traverser;
         $this->printer = $printer;
-        $this->collector = $collector;
-        $this->loader = $loader;
-
-        $this->traverser->addVisitor($this->collector);
     }
 
     /**
@@ -83,46 +67,19 @@ class Writer
     }
 
     /**
-     * @param SplFileInfo $file
+     * @param array $classMap
      */
-    public function minify(SplFileInfo $file)
+    public function minify(array $classMap)
     {
         file_put_contents($this->target, "<?php\n");
 
-        if ($stmts = $this->parser->parse($file->getContents())) {
-            $this->traverser->traverse($stmts);
-        }
-
-        $classes = $this->collector->getCollection();
-        foreach ($classes as $class => $dependencies) {
-            $classIsValid = $this->validateDependencies($dependencies, $classes);
-            if ($classIsValid && $this->loader->findFile($class)) {
+        foreach ($classMap as $file) {
+            if ($stmts = $this->parser->parse(file_get_contents($file))) {
+                $this->traverser->traverse($stmts);
                 $code = $this->printer->prettyPrintFile($stmts);
                 $code = preg_replace('/^<\?php/', '', $code);
                 file_put_contents($this->target, $code, FILE_APPEND);
             }
         }
-    }
-
-    /**
-     * @param array $dependencies
-     * @param array $classes
-     * @return bool
-     */
-    private function validateDependencies(array $dependencies, array $classes = array())
-    {
-        $classIsValid = true;
-        foreach ($dependencies as $dependency) {
-            if (isset($classes[$dependency])) {
-                return $this->validateDependencies($classes[$dependency]);
-            }
-            if (strpos('_', $dependency) === false && count(explode("\\", $dependency)) == 1) {
-                return true;
-            }
-            if (!$this->loader->findFile($dependency)) {
-                $classIsValid = false;
-            }
-        }
-        return $classIsValid;
     }
 }

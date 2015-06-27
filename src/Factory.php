@@ -54,22 +54,28 @@ class Factory
      */
     protected function createCommand(Composer $composer)
     {
-        $traverser = new \PhpParser\NodeTraverser;
-        $traverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
-        $traverser->addVisitor(new Converter);
+        $parser = new \PhpParser\Parser(new \PhpParser\Lexer\Emulative);
 
-        $writer = new Writer(
-            new \PhpParser\Parser(new \PhpParser\Lexer\Emulative),
-            $traverser,
-            new \PhpParser\PrettyPrinter\Standard,
-            new Collector,
-            $composer
-        );
+        $collector = new Collector;
+        $filterTraverser = new \PhpParser\NodeTraverser;
+        $filterTraverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
+        $filterTraverser->addVisitor($collector);
+
+        $filter = new Filter($parser, $filterTraverser, $collector, $composer);
+
+        $writeTraverser = new \PhpParser\NodeTraverser;
+        $writeTraverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
+        $writeTraverser->addVisitor(new Converter);
+        $writer = new Writer($parser, $writeTraverser, new \PhpParser\PrettyPrinter\Standard);
+
+        $finder = new Finder;
+        $finder->files()->name('*.php');
 
         $command = new Command(Message::COMMAND);
         $command->setHelp(Message::HELP);
         $command->setDescription(Message::NAME . ' (' . Message::VERSION . ')');
-        $command->setFinder(new Finder);
+        $command->setFinder($finder);
+        $command->setFilter($filter);
         $command->setWriter($writer);
 
         return $command;

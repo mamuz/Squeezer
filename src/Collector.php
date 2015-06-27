@@ -31,7 +31,7 @@ use PhpParser\NodeVisitorAbstract;
 class Collector extends NodeVisitorAbstract
 {
     /** @var array */
-    private $collection = array();
+    private $classes = array();
 
     /** @var array */
     private $dependencies = array();
@@ -53,7 +53,7 @@ class Collector extends NodeVisitorAbstract
             if ($name instanceof Node\Name) {
                 $name = $name->toString();
             }
-            $this->collection[$name] = $this->dependencies;
+            $this->classes[$name] = $this->dependencies;
         }
     }
 
@@ -75,8 +75,8 @@ class Collector extends NodeVisitorAbstract
     /**
      * @return array
      */
-    public function getCollection()
+    public function getClassDependencyMap()
     {
-        return $this->collection;
+        return $this->classes;
     }
 }

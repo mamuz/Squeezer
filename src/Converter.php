@@ -26,6 +26,7 @@
 namespace Squeeze;
 
 use PhpParser\Node;
+use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node\Stmt;
 
@@ -37,6 +38,7 @@ class Converter extends NodeVisitorAbstract
             return new Node\Name($node->toString());
         } elseif ($node instanceof Stmt\Class_
             || $node instanceof Stmt\Interface_
+            || $node instanceof Stmt\Trait_
             || $node instanceof Stmt\Function_
         ) {
             $node->name = $node->namespacedName->toString();
@@ -47,7 +49,7 @@ class Converter extends NodeVisitorAbstract
         } elseif ($node instanceof Stmt\Namespace_) {
             return $node->stmts;
         } elseif ($node instanceof Stmt\Use_) {
-            return false;
+            return NodeTraverserInterface::REMOVE_NODE;
         }
 
         return $node;
