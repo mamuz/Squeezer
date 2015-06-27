@@ -71,11 +71,11 @@ class Writer
      */
     public function minify(array $classMap)
     {
-        file_put_contents($this->target, "<?php\n");
+        file_put_contents($this->target, "<?php");
 
         foreach ($classMap as $file) {
             if ($stmts = $this->parser->parse(file_get_contents($file))) {
-                $this->traverser->traverse($stmts);
+                $stmts = $this->traverser->traverse($stmts);
                 $code = $this->printer->prettyPrintFile($stmts);
                 $code = preg_replace('/^<\?php/', '', $code);
                 file_put_contents($this->target, $code, FILE_APPEND);
