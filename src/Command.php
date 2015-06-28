@@ -81,7 +81,7 @@ class Command extends BaseCommand
     {
         $output->writeln($this->getDescription() . PHP_EOL);
 
-        $target = $input->getOption('source');
+        $target = $input->getArgument('target');
         $sources = $this->createArrayBy($input->getOption('source'));
         $excludes = $this->createArrayBy($input->getOption('exclude'));
 

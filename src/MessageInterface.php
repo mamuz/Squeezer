@@ -46,6 +46,4 @@ interface MessageInterface
     const PROGRESS_WRITE = '<comment>Write classes to %s</comment>';
 
     const PROGRESS_DONE = '<info>Squeezing successfull</info>';
-
-    const EXCEPTION = '<error>Exception:</error>';
 }
