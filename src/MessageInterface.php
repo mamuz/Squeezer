@@ -29,7 +29,7 @@ interface MessageInterface
 {
     const VERSION = 'dev-master';
 
-    const NAME = 'Squeezer by Dennis Kopp and Marco Muths';
+    const NAME = 'Squeezer';
 
     const COMMAND = 'squeeze';
 
