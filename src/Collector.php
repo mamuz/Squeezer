@@ -36,20 +36,6 @@ class Collector extends NodeVisitorAbstract
     /** @var array */
     private $dependencies = array();
 
-    public function beforeTraverse(array $nodes)
-    {
-        foreach ($nodes as $node) {
-            if (is_array($node)) {
-                return $this->beforeTraverse($nodes);
-            }
-            if ($node instanceof Node\Expr\Include_) {
-                return array();
-            }
-        }
-
-        return $nodes;
-    }
-
     public function leaveNode(Node $node)
     {
         $this->dependencies = array();
@@ -63,8 +49,8 @@ class Collector extends NodeVisitorAbstract
             $this->collect($node->extends);
             $this->add($node);
         } elseif ($node instanceof Node\Stmt\Trait_) {
-            $this->add($node);
             $this->collectTraitUsesIn($node->stmts);
+            $this->add($node);
         }
     }
 
@@ -87,14 +73,13 @@ class Collector extends NodeVisitorAbstract
      * @param Node[] $stmts
      */
     private function collectTraitUsesIn(array $stmts)
-    {
+    {;
         foreach ($stmts as $node) {
-            if (is_array($node)) {
-                $this->collectTraitUsesIn($node);
-            } else {
-                if ($node instanceof Node\Stmt\TraitUse) {
-                    $this->collect($node->traits);
-                }
+            if ($node instanceof Node\Stmt\TraitUse) {
+                $this->collect($node->traits);
+            }
+            if (property_exists($node, 'stmts') && $node->stmts) {
+                $this->collectTraitUsesIn($node->stmts);
             }
         }
     }
@@ -104,11 +89,33 @@ class Collector extends NodeVisitorAbstract
      */
     private function add(Node\Stmt\ClassLike $node)
     {
+        if ($this->findIncludeIn($node->stmts)) {
+            return;
+        }
+
         $name = $node->namespacedName;
         if ($name instanceof Node\Name) {
             $name = $name->toString();
         }
         $this->classes[$name] = $this->dependencies;
+    }
+
+    /**
+     * @param Node[] $stmts
+     * @return bool
+     */
+    private function findIncludeIn(array $stmts)
+    {
+        foreach ($stmts as $node) {
+            if ($node instanceof Node\Expr) {
+                return true;
+            }
+            if (property_exists($node, 'stmts') && is_array($node->stmts)) {
+                return $this->findIncludeIn($node->stmts);
+            }
+        }
+
+        return false;
     }
 
     /**
