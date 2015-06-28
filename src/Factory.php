@@ -64,7 +64,7 @@ class Factory
         $writeTraverser = new \PhpParser\NodeTraverser;
         $writeTraverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
         $writeTraverser->addVisitor(new Converter);
-        $writer = new Writer($parser, $writeTraverser, new \PhpParser\PrettyPrinter\Standard);
+        $writer = new Writer($parser, $writeTraverser, new Printer);
 
         $finder = new Finder;
         $finder->files()->name('*.php');

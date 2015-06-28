@@ -41,7 +41,11 @@ interface MessageInterface
 
     const OPTION_EXCLUDE = 'Exclude directories from source';
 
-    const PROGRESS_DISPLAY = '%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% Memory: %memory:6s%';
+    const PROGRESS_FILTER = '<comment>Filter classes from %d found files</comment>';
 
-    const DONE = 'Done.';
+    const PROGRESS_WRITE = '<comment>Write classes to %s</comment>';
+
+    const PROGRESS_DONE = '<info>Squeezing successfull</info>';
+
+    const EXCEPTION = '<error>Exception:</error>';
 }
