@@ -57,14 +57,14 @@ class Collector extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\Class_) {
             $this->collect(array($node->extends));
             $this->collect($node->implements);
+            $this->collectTraitUsesIn($node->stmts);
             $this->add($node);
         } elseif ($node instanceof Node\Stmt\Interface_) {
             $this->collect($node->extends);
             $this->add($node);
         } elseif ($node instanceof Node\Stmt\Trait_) {
             $this->add($node);
-        } elseif ($node instanceof Node\Stmt\TraitUse) {
-            $this->collect($node->traits);
+            $this->collectTraitUsesIn($node->stmts);
         }
     }
 
@@ -78,6 +78,22 @@ class Collector extends NodeVisitorAbstract
                 if ($name) {
                     $name = $name->toString();
                     $this->dependencies[$name] = $name;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param Node[] $stmts
+     */
+    private function collectTraitUsesIn(array $stmts)
+    {
+        foreach ($stmts as $node) {
+            if (is_array($node)) {
+                $this->collectTraitUsesIn($node);
+            } else {
+                if ($node instanceof Node\Stmt\TraitUse) {
+                    $this->collect($node->traits);
                 }
             }
         }
