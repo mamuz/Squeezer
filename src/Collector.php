@@ -36,9 +36,24 @@ class Collector extends NodeVisitorAbstract
     /** @var array */
     private $dependencies = array();
 
+    public function beforeTraverse(array $nodes)
+    {
+        foreach ($nodes as $node) {
+            if (is_array($node)) {
+                return $this->beforeTraverse($nodes);
+            }
+            if ($node instanceof Node\Expr\Include_) {
+                return array();
+            }
+        }
+
+        return $nodes;
+    }
+
     public function leaveNode(Node $node)
     {
         $this->dependencies = array();
+
         if ($node instanceof Node\Stmt\Class_) {
             $this->collect(array($node->extends));
             $this->collect($node->implements);

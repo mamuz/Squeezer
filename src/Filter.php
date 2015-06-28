@@ -95,23 +95,17 @@ class Filter
      */
     private function validateDependencies(array $dependencies, array $classDependencyMap = array())
     {
-        $classIsValid = true;
         foreach ($dependencies as $dependency) {
-            if (isset($classDependencyMap[$dependency])
-                && false === $this->validateDependencies($classDependencyMap[$dependency])
-            ) {
-                $classIsValid = false;
-                break;
-            }
-            if (strpos('_', $dependency) === false && count(explode("\\", $dependency)) == 1) {
+            if (strpos($dependency, '_') === false && count(explode("\\", $dependency)) == 1) {
                 continue;
             }
-            if (!$this->loader->findFile($dependency)) {
-                $classIsValid = false;
-                break;
+            if (!isset($classDependencyMap[$dependency])) {
+                return false;
+            } elseif (false === $this->validateDependencies($classDependencyMap[$dependency])) {
+                return false;
             }
         }
 
-        return $classIsValid;
+        return true;
     }
 }
