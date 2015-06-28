@@ -58,7 +58,12 @@ class Printer extends Standard
 
         foreach ($comments as $comment) {
             /** @var Comment $comment */
-            $result .= $comment->getReformattedText() . "\n";
+            $text = $comment->getReformattedText();
+            if (strpos($text, '//') === 0) {
+                $text = str_replace(array('/*', '*/'), '', $text);
+                $text = '/*' . substr($text, 2) . '*/';
+            }
+            $result .= $text . "\n";
         }
 
         return $result;
