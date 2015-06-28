@@ -41,6 +41,8 @@ interface MessageInterface
 
     const OPTION_EXCLUDE = 'Exclude directories from source';
 
+    const OPTION_NOCOMMENTS = 'Strip comments from code';
+
     const PROGRESS_FILTER = '<comment>Filter classes from %d found files</comment>';
 
     const PROGRESS_WRITE = '<comment>Write classes to %s</comment>';

@@ -74,6 +74,7 @@ class Command extends BaseCommand
         $this->addArgument('target', InputArgument::REQUIRED, Message::ARGUMENT_TARGET);
         $this->addOption('source', 's', InputOption::VALUE_OPTIONAL, Message::OPTION_SOURCE, '.');
         $this->addOption('exclude', 'e', InputOption::VALUE_OPTIONAL, Message::OPTION_EXCLUDE);
+        $this->addOption('nocomments', 'c', InputOption::VALUE_NONE, Message::OPTION_NOCOMMENTS);
 
     }
 
@@ -84,6 +85,7 @@ class Command extends BaseCommand
         $target = $input->getArgument('target');
         $sources = $this->createArrayBy($input->getOption('source'));
         $excludes = $this->createArrayBy($input->getOption('exclude'));
+        $noComments = (bool) $input->getOption('nocomments');
 
         $this->writer->setTarget($target);
         $this->finder->in($sources)->exclude($excludes);
@@ -92,7 +94,7 @@ class Command extends BaseCommand
         $classMap = $this->filter->extractClassMap($this->finder);
 
         $output->writeln(sprintf(Message::PROGRESS_WRITE, $target));
-        $this->writer->minify($classMap);
+        $this->writer->minify($classMap, $noComments);
 
         $output->writeln(PHP_EOL . Message::PROGRESS_DONE . PHP_EOL);
     }

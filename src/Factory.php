@@ -60,11 +60,7 @@ class Factory
         $filterTraverser->addVisitor($collector);
 
         $filter = new Filter($parser, $filterTraverser, $collector, $composer);
-
-        $writeTraverser = new \PhpParser\NodeTraverser;
-        $writeTraverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
-        $writeTraverser->addVisitor(new Converter);
-        $writer = new Writer($parser, $writeTraverser, new Printer);
+        $writer = new Writer($parser, new \PhpParser\NodeTraverser, new Printer);
 
         $finder = new Finder;
         $finder->files()->name('*.php');

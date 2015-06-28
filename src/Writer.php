@@ -27,7 +27,6 @@ namespace Squeeze;
 
 use PhpParser\NodeTraverser;
 use PhpParser\ParserAbstract;
-use PhpParser\PrettyPrinter\Standard as Printer;
 
 class Writer
 {
@@ -68,16 +67,20 @@ class Writer
 
     /**
      * @param array $classMap
+     * @param bool $noComments
      */
-    public function minify(array $classMap)
+    public function minify(array $classMap, $noComments)
     {
-        file_put_contents($this->target, "<?php");
+        if ($noComments) {
+            $this->printer->disableComments();
+        }
+
+        file_put_contents($this->target, "<?php ");
 
         foreach ($classMap as $file) {
             if ($stmts = $this->parser->parse(file_get_contents($file))) {
                 $stmts = $this->traverser->traverse($stmts);
                 $code = $this->printer->prettyPrintFile($stmts);
-                $code = preg_replace('/^<\?php/', '', $code);
                 file_put_contents($this->target, $code, FILE_APPEND);
             }
         }
