@@ -81,16 +81,17 @@ class Command extends BaseCommand
     {
         $output->writeln($this->getDescription() . PHP_EOL);
 
-        $this->writer->setTarget($input->getArgument('target'));
+        $target = $input->getOption('source');
         $sources = $this->createArrayBy($input->getOption('source'));
         $excludes = $this->createArrayBy($input->getOption('exclude'));
+
+        $this->writer->setTarget($target);
         $this->finder->in($sources)->exclude($excludes);
 
         $output->writeln(sprintf(Message::PROGRESS_FILTER, $this->finder->count()));
-
         $classMap = $this->filter->extractClassMap($this->finder);
 
-        $output->writeln(sprintf(Message::PROGRESS_WRITE, $input->getArgument('target')));
+        $output->writeln(sprintf(Message::PROGRESS_WRITE, $target));
         $this->writer->minify($classMap);
 
         $output->writeln(PHP_EOL . Message::PROGRESS_DONE . PHP_EOL);
