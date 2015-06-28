@@ -35,8 +35,6 @@ use Symfony\Component\Finder\Finder;
 
 class Command extends BaseCommand
 {
-    const EXIT_SUCCESS = 0, EXIT_VIOLATION = 1;
-
     /** @var Finder */
     private $finder;
 
@@ -81,29 +79,21 @@ class Command extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        try {
-            $output->writeln($this->getDescription() . PHP_EOL);
+        $output->writeln($this->getDescription() . PHP_EOL);
 
-            $this->writer->setTarget($input->getArgument('target'));
-            $sources = $this->createArrayBy($input->getOption('source'));
-            $excludes = $this->createArrayBy($input->getOption('exclude'));
-            $this->finder->in($sources)->exclude($excludes);
+        $this->writer->setTarget($input->getArgument('target'));
+        $sources = $this->createArrayBy($input->getOption('source'));
+        $excludes = $this->createArrayBy($input->getOption('exclude'));
+        $this->finder->in($sources)->exclude($excludes);
 
-            $output->writeln(sprintf(Message::PROGRESS_FILTER, $this->finder->count()));
+        $output->writeln(sprintf(Message::PROGRESS_FILTER, $this->finder->count()));
 
-            $classMap = $this->filter->extractClassMap($this->finder);
+        $classMap = $this->filter->extractClassMap($this->finder);
 
-            $output->writeln(sprintf(Message::PROGRESS_WRITE, $input->getArgument('target')));
-            $this->writer->minify($classMap);
+        $output->writeln(sprintf(Message::PROGRESS_WRITE, $input->getArgument('target')));
+        $this->writer->minify($classMap);
 
-            $output->writeln(PHP_EOL . Message::PROGRESS_DONE . PHP_EOL);
-            return self::EXIT_SUCCESS;
-
-        } catch (\Exception $e) {
-            $output->writeln(Message::EXCEPTION . PHP_EOL);
-            $output->writeln($e->getMessage());
-            return self::EXIT_VIOLATION;
-        }
+        $output->writeln(PHP_EOL . Message::PROGRESS_DONE . PHP_EOL);
     }
 
     /**
