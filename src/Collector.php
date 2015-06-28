@@ -57,18 +57,14 @@ class Collector extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\Class_) {
             $this->collect(array($node->extends));
             $this->collect($node->implements);
+            $this->add($node);
         } elseif ($node instanceof Node\Stmt\Interface_) {
             $this->collect($node->extends);
+            $this->add($node);
+        } elseif ($node instanceof Node\Stmt\Trait_) {
+            $this->add($node);
         } elseif ($node instanceof Node\Stmt\TraitUse) {
             $this->collect($node->traits);
-        }
-
-        if ($node instanceof Node\Stmt\ClassLike) {
-            $name = $node->namespacedName;
-            if ($name instanceof Node\Name) {
-                $name = $name->toString();
-            }
-            $this->classes[$name] = $this->dependencies;
         }
     }
 
@@ -85,6 +81,18 @@ class Collector extends NodeVisitorAbstract
                 }
             }
         }
+    }
+
+    /**
+     * @param Node\Stmt\ClassLike $node
+     */
+    private function add(Node\Stmt\ClassLike $node)
+    {
+        $name = $node->namespacedName;
+        if ($name instanceof Node\Name) {
+            $name = $name->toString();
+        }
+        $this->classes[$name] = $this->dependencies;
     }
 
     /**
