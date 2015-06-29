@@ -49,6 +49,10 @@ class Printer extends Standard
         $p = preg_replace('/^\?>\n?/', '', $p, -1);
         $p = preg_replace('/<\?php$/', '', $p);
 
+        if (strpos($p, 'namespace ') !== 0) {
+            $p = 'namespace {' . $p . '}';
+        }
+
         return $p;
     }
 
