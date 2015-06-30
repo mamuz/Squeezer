@@ -27,7 +27,7 @@ namespace Squeeze;
 
 interface MessageInterface
 {
-    const VERSION = 'v0.1.0';
+    const VERSION = 'dev-master';
 
     const NAME = 'Squeezer';
 
