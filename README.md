@@ -32,7 +32,7 @@ The recommended way to install
 
 - Minify classes, interfaces and traits to one compressed file.
 - Validates availability of class dependencies.
-- Removing comments and docblocks is optional to keep interoperability to annotations parser.
+- Removing comments and docblocks is optional to keep interoperability to annotation parser.
 - PHP files with more than one class, interface or trait declarations will be skipped.
 - PHP files with `include`, `include_once`, `require` or `require_once` statements will be skipped
 
@@ -43,7 +43,7 @@ Run this command line to squeeze your library without comments to `classes.min.p
 ```sh
 ./vendor/bin/squeeze classes.min.php --source="modules/*/src, vendor/zendframework/*/src" --exclude="zend-loader" --nocomments
 ```
-(For instance, we are using a typical ZendFramework Application, but you can adapt the command to each environment)
+*For instance, we are using a typical ZendFramework Application, but you can adapt this command to each environment*
 
 After that you can include `classes.min.php` inside your `index.php`, but before loading composer autoloader.
 
@@ -52,7 +52,7 @@ For instace...
 ```php
 //...
 include_once 'classes.min.php';
-include_once '/../vendor/autoload.php'; // composer autoloader
+include_once 'vendor/autoload.php'; // composer autoloader
 //...
 ```
 
