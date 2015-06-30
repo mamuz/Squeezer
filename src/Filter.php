@@ -93,15 +93,13 @@ class Filter
      * @param array $classDependencyMap
      * @return bool
      */
-    private function validateDependencies(array $dependencies, array $classDependencyMap = array())
+    private function validateDependencies(array $dependencies, array $classDependencyMap)
     {
         foreach ($dependencies as $dependency) {
             if (strpos($dependency, '_') === false && count(explode("\\", $dependency)) == 1) {
                 continue;
             }
             if (!isset($classDependencyMap[$dependency])) {
-                return false;
-            } elseif (false === $this->validateDependencies($classDependencyMap[$dependency])) {
                 return false;
             }
         }
