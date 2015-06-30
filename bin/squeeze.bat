@@ -6,4 +6,4 @@ GOTO RUN
 :USE_PEAR_PATH
 set PHPBIN=%PHP_PEAR_PHP_BIN%
 :RUN
-"%PHPBIN%" "@bin_dir@\phpda.php" %*
+"%PHPBIN%" "@bin_dir@\squeeze.php" %*
