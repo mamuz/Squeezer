@@ -71,7 +71,7 @@ class Filter
         $classMap = array();
         $classDependencyMap = $this->collector->getClassDependencyMap();
         foreach ($classDependencyMap as $class => $dependencies) {
-            if ($this->validateDependencies($dependencies)
+            if ($this->validate($dependencies)
                 && $file = $this->collector->getFileBy($class)
             ) {
                 $classMap[$class] = $file;
@@ -85,7 +85,7 @@ class Filter
      * @param array $dependencies
      * @return bool
      */
-    private function validateDependencies(array $dependencies)
+    private function validate(array $dependencies)
     {
         foreach ($dependencies as $dependency) {
             if (strpos($dependency, '_') === false
