@@ -107,7 +107,7 @@ class Collector extends NodeVisitorAbstract
     private function findIncludeIn(array $stmts)
     {
         foreach ($stmts as $node) {
-            if ($node instanceof Node\Expr) {
+            if ($node instanceof Node\Expr\Include_) {
                 return true;
             }
             if (property_exists($node, 'stmts') && is_array($node->stmts)) {
