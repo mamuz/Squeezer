@@ -1,10 +1,10 @@
 {
     "name"             : "mamuz/squeezer",
     "type"             : "project",
-    "description"      : "",
+    "description"      : "PHP library minifier",
     "homepage"         : "https://github.com/mamuz/Squeezer",
     "license"          : "MIT",
-    "keywords"         : [],
+    "keywords"         : ["Minify", "Performance", "Improvement"],
     "authors"          : [
         {
             "name" : "Marco Muths",
