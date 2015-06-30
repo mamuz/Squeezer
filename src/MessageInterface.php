@@ -37,9 +37,9 @@ interface MessageInterface
 
     const ARGUMENT_TARGET = 'File for squeezed output';
 
-    const OPTION_SOURCE = 'Directories to squeeze';
+    const OPTION_SOURCE = 'Directories to squeeze (comma-separated)';
 
-    const OPTION_EXCLUDE = 'Exclude directories from source';
+    const OPTION_EXCLUDE = 'Exclude directories from source (comma-separated)';
 
     const OPTION_NOCOMMENTS = 'Remove comments from code';
 
