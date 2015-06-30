@@ -27,7 +27,7 @@ namespace Squeeze;
 
 interface MessageInterface
 {
-    const VERSION = 'dev-master';
+    const VERSION = 'v0.1.0';
 
     const NAME = 'Squeezer';
 
@@ -37,15 +37,15 @@ interface MessageInterface
 
     const ARGUMENT_TARGET = 'File for squeezed output';
 
-    const OPTION_SOURCE = 'Directory to squeeze';
+    const OPTION_SOURCE = 'Directories to squeeze';
 
     const OPTION_EXCLUDE = 'Exclude directories from source';
 
-    const OPTION_NOCOMMENTS = 'Strip comments from code';
+    const OPTION_NOCOMMENTS = 'Remove comments from code';
 
     const PROGRESS_FILTER = '<comment>Filter classes from %d found files</comment>';
 
     const PROGRESS_WRITE = '<comment>Write classes to %s</comment>';
 
-    const PROGRESS_DONE = '<info>Squeezing successfull</info>';
+    const PROGRESS_DONE = '<info>Squeezing successful</info>';
 }
