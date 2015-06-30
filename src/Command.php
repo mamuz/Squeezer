@@ -91,7 +91,7 @@ class Command extends BaseCommand
         $this->finder->in($sources)->exclude($excludes);
 
         $output->writeln(sprintf(Message::PROGRESS_FILTER, $this->finder->count()));
-        $classMap = $this->filter->extractClassMap($this->finder);
+        $classMap = $this->filter->extractClassMapFrom($this->finder->getIterator());
 
         $output->writeln(sprintf(Message::PROGRESS_WRITE, $target));
         $this->writer->minify($classMap, $noComments);

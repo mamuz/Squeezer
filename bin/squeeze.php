@@ -27,8 +27,8 @@ set_time_limit(0);
 ini_set('memory_limit', -1);
 ini_set('xdebug.max_nesting_level', 4000);
 
-if (!($loader = @include_once __DIR__ . '/../vendor/autoload.php')
-    && !($loader = @include_once __DIR__ . '/../../../autoload.php')
+if (!(@include_once __DIR__ . '/../vendor/autoload.php')
+    && !(@include_once __DIR__ . '/../../../autoload.php')
 ) {
     throw new \RuntimeException('Cannot find vendor/autoload.php');
 }
@@ -40,4 +40,4 @@ set_error_handler(
 );
 
 $appFactory = new Squeeze\Factory;
-$appFactory->create($loader)->run();
+$appFactory->create()->run();

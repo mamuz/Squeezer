@@ -34,7 +34,13 @@ class Collector extends NodeVisitorAbstract
     private $classes = array();
 
     /** @var array */
+    private $classMap = array();
+
+    /** @var array */
     private $dependencies = array();
+
+    /** @var string */
+    private $file;
 
     public function leaveNode(Node $node)
     {
@@ -73,7 +79,7 @@ class Collector extends NodeVisitorAbstract
      * @param Node[] $stmts
      */
     private function collectTraitUsesIn(array $stmts)
-    {;
+    {
         foreach ($stmts as $node) {
             if ($node instanceof Node\Stmt\TraitUse) {
                 $this->collect($node->traits);
@@ -97,7 +103,13 @@ class Collector extends NodeVisitorAbstract
         if ($name instanceof Node\Name) {
             $name = $name->toString();
         }
-        $this->classes[$name] = $this->dependencies;
+
+        if (array_key_exists($name, $this->classes)) {
+            unset ($this->classes[$name]);
+        } else {
+            $this->classes[$name] = $this->dependencies;
+            $this->classMap[$name] = $this->file;
+        }
     }
 
     /**
@@ -116,6 +128,27 @@ class Collector extends NodeVisitorAbstract
         }
 
         return false;
+    }
+
+    /**
+     * @param string $file
+     */
+    public function bind($file)
+    {
+        $this->file = $file;
+    }
+
+    /**
+     * @param $class
+     * @return null|string
+     */
+    public function getFileBy($class)
+    {
+        if (array_key_exists($class, $this->classMap)) {
+            return $this->classMap[$class];
+        }
+
+        return null;
     }
 
     /**

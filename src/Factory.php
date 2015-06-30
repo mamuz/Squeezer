@@ -35,22 +35,20 @@ use Symfony\Component\Finder\Finder;
 class Factory
 {
     /**
-     * @param Composer $loader
      * @return Application
      */
-    public function create(Composer $loader)
+    public function create()
     {
         $app = new Application(Message::NAME, Message::VERSION);
-        $app->add($this->createCommand($loader));
+        $app->add($this->createCommand());
 
         return $app;
     }
 
     /**
-     * @param Composer $composer
      * @return Command
      */
-    protected function createCommand(Composer $composer)
+    protected function createCommand()
     {
         $parser = new \PhpParser\Parser(new \PhpParser\Lexer\Emulative);
 
@@ -59,7 +57,7 @@ class Factory
         $filterTraverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
         $filterTraverser->addVisitor($collector);
 
-        $filter = new Filter($parser, $filterTraverser, $collector, $composer);
+        $filter = new Filter($parser, $filterTraverser, $collector);
         $writer = new Writer($parser, new \PhpParser\NodeTraverser, new Printer);
 
         $finder = new Finder;

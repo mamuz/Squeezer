@@ -25,10 +25,8 @@
 
 namespace Squeeze;
 
-use Composer\Autoload\ClassLoader;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserAbstract;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 class Filter
@@ -39,9 +37,6 @@ class Filter
     /** @var NodeTraverser */
     private $traverser;
 
-    /** @var ClassLoader */
-    private $loader;
-
     /** @var Collector */
     private $collector;
 
@@ -49,29 +44,26 @@ class Filter
      * @param ParserAbstract $parser
      * @param NodeTraverser  $traverser
      * @param Collector      $collector
-     * @param ClassLoader    $loader
      */
     public function __construct(
         ParserAbstract $parser,
         NodeTraverser $traverser,
-        Collector $collector,
-        ClassLoader $loader
+        Collector $collector
     ) {
         $this->parser = $parser;
         $this->traverser = $traverser;
         $this->collector = $collector;
-        $this->loader = $loader;
     }
 
     /**
-     * @param Finder $finder
+     * @param \Iterator|SplFileInfo[] $files
      * @return array
      */
-    public function extractClassMap(Finder $finder)
+    public function extractClassMapFrom(\Iterator $files)
     {
-        foreach ($finder as $file) {
-            /** @var SplFileInfo $file */
+        foreach ($files as $file) {
             if ($stmts = $this->parser->parse($file->getContents())) {
+                $this->collector->bind($file->getRealPath());
                 $this->traverser->traverse($stmts);
             }
         }
@@ -79,8 +71,9 @@ class Filter
         $classMap = array();
         $classDependencyMap = $this->collector->getClassDependencyMap();
         foreach ($classDependencyMap as $class => $dependencies) {
-            $classIsValid = $this->validateDependencies($dependencies, $classDependencyMap);
-            if ($classIsValid && $file = $this->loader->findFile($class)) {
+            if ($this->validateDependencies($dependencies)
+                && $file = $this->collector->getFileBy($class)
+            ) {
                 $classMap[$class] = $file;
             }
         }
@@ -90,16 +83,17 @@ class Filter
 
     /**
      * @param array $dependencies
-     * @param array $classDependencyMap
      * @return bool
      */
-    private function validateDependencies(array $dependencies, array $classDependencyMap)
+    private function validateDependencies(array $dependencies)
     {
         foreach ($dependencies as $dependency) {
-            if (strpos($dependency, '_') === false && count(explode("\\", $dependency)) == 1) {
+            if (strpos($dependency, '_') === false
+                && count(explode("\\", $dependency)) == 1
+            ) {
                 continue;
             }
-            if (!isset($classDependencyMap[$dependency])) {
+            if (!isset($this->collector->getClassDependencyMap()[$dependency])) {
                 return false;
             }
         }
