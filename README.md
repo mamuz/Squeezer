@@ -2,7 +2,6 @@ Squeezer
 ========
 
 [![Author](http://img.shields.io/badge/author-@mamuz_de-blue.svg?style=flat-square)](https://twitter.com/mamuz_de)
-[![Build Status](https://img.shields.io/travis/mamuz/Squeezer.svg?style=flat-square)](https://travis-ci.org/mamuz/Squeezer)
 [![Latest Stable Version](https://img.shields.io/packagist/v/mamuz/squeezer.svg?style=flat-square)](https://packagist.org/packages/mamuz/squeezer)
 [![Total Downloads](https://img.shields.io/packagist/dt/mamuz/squeezer.svg?style=flat-square)](https://packagist.org/packages/mamuz/squeezer)
 [![License](https://img.shields.io/packagist/l/mamuz/squeezer.svg?style=flat-square)](https://packagist.org/packages/mamuz/squeezer)
