@@ -46,7 +46,7 @@ The recommended way to install
 Run this command line to squeeze your library without comments to `classes.min.php`:
 
 ```sh
-./vendor/bin/squeeze classes.min.php --source="modules/*/src, vendor/zendframework/*/src" --exclude="zend-loader" --nocomments
+./vendor/bin/squeeze classes.min.php --source="module/*/src, vendor/zendframework/*/src" --exclude="zend-loader" --nocomments
 ```
 *For instance, we are using a typical ZendFramework Application, but you can adapt this command to each environment*
 
