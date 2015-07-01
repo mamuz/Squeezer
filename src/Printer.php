@@ -49,11 +49,26 @@ class Printer extends Standard
         $p = preg_replace('/^\?>\n?/', '', $p, -1);
         $p = preg_replace('/<\?php$/', '', $p);
 
-        if (strpos($p, 'namespace ') !== 0) {
+        if (!$this->findNamespaceIn($stmts)) {
             $p = 'namespace {' . $p . '}';
         }
 
         return $p;
+    }
+
+    /**
+     * @param array $stmts
+     * @return bool
+     */
+    private function findNamespaceIn(array $stmts)
+    {
+        foreach ($stmts as $stmt) {
+            if ($stmt instanceof \PhpParser\Node\Stmt\Namespace_) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function preprocessNodes(array $nodes)
