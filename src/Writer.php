@@ -67,7 +67,7 @@ class Writer
 
     /**
      * @param array $classMap
-     * @param bool $noComments
+     * @param bool  $noComments
      */
     public function minify(array $classMap, $noComments)
     {

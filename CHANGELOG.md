@@ -1,9 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## v0.1.1 - UNRELEASED
+## v0.1.2 - UNRELEASED
+Nothing yet.
+
+## v0.1.1 - 2015-07-01
 ### Added
 - UnitTest Environment
+
+### Fixed
+- Sort namespaces
 
 ### Changed
 - Improve synopsis
