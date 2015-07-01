@@ -1,10 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## v0.1.2 - UNRELEASED
-Nothing yet.
-
-## v0.1.1 - 2015-07-01
+## v0.1.1- UNRELEASED
 ### Added
 - UnitTest Environment
 
