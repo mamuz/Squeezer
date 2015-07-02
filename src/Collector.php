@@ -36,21 +36,92 @@ class Collector extends NodeVisitorAbstract
     /** @var array */
     private $dependencies = array();
 
+    /** @var Node\Stmt\ClassLike[] */
+    private $foundClasses = array();
+
+    /** @var bool */
+    private $hasFoundInvalidStmt = false;
+
+    private $invalidFunctions = array(
+        'basename',
+        'chgrp',
+        'chmod',
+        'chown',
+        'clearstatcache',
+        'copy',
+        'delete',
+        'dirname',
+        'disk_​free_​space',
+        'disk_​total_​space',
+        'diskfreespace',
+        'file_​exists',
+        'file_​get_​contents',
+        'file_​put_​contents',
+        'file',
+        'fileatime',
+        'filectime',
+        'filegroup',
+        'fileinode',
+        'filemtime',
+        'fileowner',
+        'fileperms',
+        'filesize',
+        'filetype',
+        'fnmatch',
+        'fopen',
+        'glob',
+        'is_​dir',
+        'is_​executable',
+        'is_​file',
+        'is_​link',
+        'is_​readable',
+        'is_​uploaded_​file',
+        'is_​writable',
+        'is_​writeable',
+        'lchgrp',
+        'lchown',
+        'link',
+        'linkinfo',
+        'lstat',
+        'mkdir',
+        'move_​uploaded_​file',
+        'parse_​ini_​file',
+        'parse_​ini_​string',
+        'pathinfo',
+        'readfile',
+        'readlink',
+        'realpath',
+        'rename',
+        'rmdir',
+        'stat',
+        'symlink',
+        'tempnam',
+        'touch',
+        'unlink',
+        'stream_resolve_include_path',
+        'stream_is_local',
+    );
+
     public function leaveNode(Node $node)
     {
-        $this->dependencies = array();
-
         if ($node instanceof Node\Stmt\Class_) {
             $this->collect(array($node->extends));
             $this->collect($node->implements);
-            $this->collectTraitUsesIn($node->stmts);
-            $this->add($node);
+            $this->foundClasses[] = $node;
         } elseif ($node instanceof Node\Stmt\Interface_) {
             $this->collect($node->extends);
-            $this->add($node);
+            $this->foundClasses[] = $node;
         } elseif ($node instanceof Node\Stmt\Trait_) {
-            $this->collectTraitUsesIn($node->stmts);
-            $this->add($node);
+            $this->foundClasses[] = $node;
+        } elseif ($node instanceof Node\Stmt\TraitUse) {
+            $this->collect($node->traits);
+        } elseif ($node instanceof Node\Expr\Include_) {
+            $this->hasFoundInvalidStmt = true;
+        } elseif ($node instanceof Node\Expr\FuncCall) {
+            $function = $node->name->toString();
+            if (in_array($function, $this->invalidFunctions)) {
+                $this->hasFoundInvalidStmt = true;
+            }
         }
     }
 
@@ -69,60 +140,22 @@ class Collector extends NodeVisitorAbstract
         }
     }
 
-    /**
-     * @param Node[] $stmts
-     */
-    private function collectTraitUsesIn(array $stmts)
+    public function reset()
     {
-        foreach ($stmts as $node) {
-            if ($node instanceof Node\Stmt\TraitUse) {
-                $this->collect($node->traits);
+        if (count($this->foundClasses) == 1
+            && !$this->hasFoundInvalidStmt
+        ) {
+            $node = array_shift($this->foundClasses);
+            $name = $node->namespacedName;
+            if ($name instanceof Node\Name) {
+                $name = $name->toString();
             }
-            if (property_exists($node, 'stmts') && $node->stmts) {
-                $this->collectTraitUsesIn($node->stmts);
-            }
-        }
-    }
-
-    /**
-     * @param Node\Stmt\ClassLike $node
-     */
-    private function add(Node\Stmt\ClassLike $node)
-    {
-        if ($this->findIncludeIn($node)) {
-            return;
+            $this->classMap[$name] = $this->dependencies;
         }
 
-        $name = $node->namespacedName;
-        if ($name instanceof Node\Name) {
-            $name = $name->toString();
-        }
-
-        $this->classMap[$name] = $this->dependencies;
-    }
-
-    /**
-     * @param Node $stmts
-     * @return bool
-     */
-    private function findIncludeIn($stmts)
-    {
-        if (is_array($stmts)) {
-            foreach ($stmts as $node) {
-                if ($node instanceof Node) {
-                    if ($node instanceof Node\Expr\Include_) {
-                        return true;
-                    }
-                }
-                if (is_array($node)) {
-                    if ($this->findIncludeIn($node)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        $this->dependencies = array();
+        $this->foundClasses = array();
+        $this->hasFoundInvalidStmt = false;
     }
 
     /**

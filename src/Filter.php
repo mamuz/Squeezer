@@ -72,6 +72,7 @@ class Filter
         foreach ($files as $file) {
             if ($stmts = $this->parser->parse($file->getContents())) {
                 $this->traverser->traverse($stmts);
+                $this->collector->reset();
             }
         }
 
@@ -129,7 +130,11 @@ class Filter
     {
         $classes = array_keys($classMap);
 
-        set_error_handler(function(){});
+        set_error_handler(
+            function ($code, $message, $file, $line) {
+                echo "<error>[$code] $message on line $line in $file</error>";
+            }
+        );
         foreach ($classes as $class) {
             class_exists($class, true);
         }
