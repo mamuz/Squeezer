@@ -134,7 +134,7 @@ class Filter
         $classes = array_keys($classMap);
 
         foreach ($classes as $class) {
-            $this->classloader->loadClass($class);
+            class_exists($class, true);
         }
 
         $classIncludes = array_merge(
