@@ -106,21 +106,23 @@ class Collector extends NodeVisitorAbstract
     }
 
     /**
-     * @param Node[] $stmts
+     * @param Node $stmts
      * @return bool
      */
     private function findIncludeIn($stmts)
     {
-        foreach ($stmts as $node) {
-            if ($node instanceof Node) {
-                if ($node instanceof Node\Expr\Include_) {
-                    return true;
-                }
-            }
-            if (is_array($node)) {
-                foreach ($node as $value) {
-                    if ($this->findIncludeIn($value)) {
+        if (is_array($stmts)) {
+            foreach ($stmts as $node) {
+                if ($node instanceof Node) {
+                    if ($node instanceof Node\Expr\Include_) {
                         return true;
+                    }
+                }
+                if (is_array($node)) {
+                    foreach ($node as $value) {
+                        if ($this->findIncludeIn($value)) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -132,7 +134,8 @@ class Collector extends NodeVisitorAbstract
     /**
      * @return array
      */
-    public function getClassMap()
+    public
+    function getClassMap()
     {
         return $this->classMap;
     }
