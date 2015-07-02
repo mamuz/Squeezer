@@ -96,10 +96,12 @@ class Filter
                         || interface_exists($dependency, false)
                         || trait_exists($dependency, false))
                 ) {
+                    set_error_handler(null);
                     $reflectionClass = new \ReflectionClass($class);
                     if ($reflectionClass->isInternal() || $reflectionClass->getExtensionName()) {
                         unset($classMap[$class][$index]);
                     }
+                    restore_error_handler();
                 }
             }
         }
