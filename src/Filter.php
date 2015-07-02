@@ -133,9 +133,11 @@ class Filter
     {
         $classes = array_keys($classMap);
 
+        set_error_handler(null);
         foreach ($classes as $class) {
             class_exists($class, true);
         }
+        restore_error_handler();
 
         $classIncludes = array_merge(
             get_declared_interfaces(),
