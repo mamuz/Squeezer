@@ -25,7 +25,7 @@
 
 namespace Squeeze;
 
-use Composer\Autoload\ClassLoader as Composer;
+use Composer\Autoload\ClassLoader;
 use Squeeze\MessageInterface as Message;
 use Symfony\Component\Finder\Finder;
 
@@ -35,20 +35,22 @@ use Symfony\Component\Finder\Finder;
 class Factory
 {
     /**
+     * @param ClassLoader $loader
      * @return Application
      */
-    public function create()
+    public function create(ClassLoader $loader)
     {
         $app = new Application(Message::NAME, Message::VERSION);
-        $app->add($this->createCommand());
+        $app->add($this->createCommand($loader));
 
         return $app;
     }
 
     /**
+     * @param ClassLoader $loader
      * @return Command
      */
-    protected function createCommand()
+    protected function createCommand(ClassLoader $loader)
     {
         $parser = new \PhpParser\Parser(new \PhpParser\Lexer\Emulative);
 
@@ -57,7 +59,7 @@ class Factory
         $filterTraverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
         $filterTraverser->addVisitor($collector);
 
-        $filter = new Filter($parser, $filterTraverser, $collector);
+        $filter = new Filter($parser, $filterTraverser, $collector, $loader);
         $writer = new Writer($parser, new \PhpParser\NodeTraverser, new Printer);
 
         $finder = new Finder;

@@ -25,6 +25,7 @@
 
 namespace Squeeze;
 
+use Composer\Autoload\ClassLoader;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserAbstract;
 use Symfony\Component\Finder\SplFileInfo;
@@ -41,19 +42,25 @@ class Filter
     /** @var Collector */
     private $collector;
 
+    /** @var ClassLoader */
+    private $classloader;
+
     /**
      * @param ParserAbstract $parser
      * @param NodeTraverser  $traverser
      * @param Collector      $collector
+     * @param ClassLoader    $classloader
      */
     public function __construct(
         ParserAbstract $parser,
         NodeTraverser $traverser,
-        Collector $collector
+        Collector $collector,
+        ClassLoader $classloader
     ) {
         $this->parser = $parser;
         $this->traverser = $traverser;
         $this->collector = $collector;
+        $this->classloader = $classloader;
     }
 
     /**
@@ -64,97 +71,82 @@ class Filter
     {
         foreach ($files as $file) {
             if ($stmts = $this->parser->parse($file->getContents())) {
-                $this->collector->bind($file->getRealPath());
                 $this->traverser->traverse($stmts);
             }
         }
 
-        $classMap = $this->collector->getClassDependencyMap();
-        $classMap = $this->removeInternalsFrom($classMap);
-        $classMap = $this->removeInvalidClassesFrom($classMap);
+        $classMap = $this->collector->getClassMap();
+        $classMap = $this->removeInternalClassesFrom($classMap);
+        $classMap = $this->removeUnloadableClassesFrom($classMap);
         $classMap = $this->sort($classMap);
-        $classMap = $this->assignFilesTo($classMap);
 
         return $classMap;
     }
 
     /**
-     * @param array $classDependencyMap
+     * @param array $classMap
      * @return array
      */
-    private function removeInternalsFrom(array $classDependencyMap)
+    private function removeInternalClassesFrom(array $classMap)
     {
-        foreach ($classDependencyMap as $class => $dependencies) {
-            foreach ($dependencies as $dependency) {
-                if (strpos($dependency, '_') === false
-                    && count(explode("\\", $dependency)) == 1
+        foreach ($classMap as $class => $dependencies) {
+            foreach ($dependencies as $index => $dependency) {
+                if (!$this->classloader->findFile($dependency)
+                    && (class_exists($dependency, false)
+                        || interface_exists($dependency, false)
+                        || trait_exists($dependency, false))
                 ) {
-                    unset($classDependencyMap[$class][$dependency]);
+                    unset($classMap[$class][$index]);
                 }
             }
         }
 
-        return $classDependencyMap;
+        return $classMap;
     }
 
     /**
-     * @param array $classDependencyMap
+     * @param array $classMap
      * @return array
      */
-    private function removeInvalidClassesFrom(array $classDependencyMap)
+    private function removeUnloadableClassesFrom(array $classMap)
     {
-        foreach ($classDependencyMap as $class => $dependencies) {
+        foreach ($classMap as $class => $dependencies) {
             foreach ($dependencies as $dependency) {
-                if (!isset($classDependencyMap[$dependency])) {
-                    unset($classDependencyMap[$class]);
-                    $classDependencyMap = $this->removeInvalidClassesFrom($classDependencyMap);
+                if (!isset($classMap[$dependency])
+                    || !$this->classloader->findFile($dependency)
+                ) {
+                    unset($classMap[$class]);
+                    $classMap = $this->removeUnloadableClassesFrom($classMap);
                     break 2;
                 }
             }
         }
 
-        return $classDependencyMap;
+        return $classMap;
     }
 
     /**
-     * @param array $classDependencyMap
+     * @param array $classMap
      * @return array
      */
-    private function sort(array $classDependencyMap)
+    private function sort(array $classMap)
     {
-        $classesSorted = array();
+        $classes = array_keys($classMap);
 
-        foreach ($classDependencyMap as $class => $dependencies) {
-            if (!in_array($class, $classesSorted)) {
-                $classesSorted[] = $class;
-            }
-            foreach ($dependencies as $dependency) {
-                $classPosition = array_search($class, $classesSorted);
-                $dependencyPosition = array_search($dependency, $classesSorted);
-                if (false !== $dependencyPosition) {
-                    if ($dependencyPosition < $classPosition) {
-                        continue;
-                    }
-                }
-                $before = array_slice($classesSorted, 0, $classPosition);
-                $after = array_slice($classesSorted, $classPosition, count($classesSorted));
-                $classesSorted = array_merge($before, array($dependency), $after);
-            }
+        foreach ($classes as $class) {
+            $this->classloader->loadClass($class);
         }
 
-        return $classesSorted;
-    }
+        $classIncludes = array_merge(
+            get_declared_interfaces(),
+            get_declared_traits(),
+            get_declared_classes()
+        );
 
-    /**
-     * @param $classDependencyMap
-     * @return array
-     */
-    private function assignFilesTo($classDependencyMap)
-    {
         $classMap = array();
-        foreach ($classDependencyMap as $class) {
-            if ($file = $this->collector->getFileBy($class)) {
-                $classMap[$class] = $file;
+        foreach ($classIncludes as $class) {
+            if (in_array($class, $classes)) {
+                $classMap[$class] = $this->classloader->findFile($class);
             }
         }
 

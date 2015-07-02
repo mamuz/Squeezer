@@ -31,16 +31,11 @@ use PhpParser\NodeVisitorAbstract;
 class Collector extends NodeVisitorAbstract
 {
     /** @var array */
-    private $classes = array();
-
-    /** @var array */
     private $classMap = array();
+
 
     /** @var array */
     private $dependencies = array();
-
-    /** @var string */
-    private $file;
 
     public function leaveNode(Node $node)
     {
@@ -105,10 +100,9 @@ class Collector extends NodeVisitorAbstract
         }
 
         if (array_key_exists($name, $this->classes)) {
-            unset ($this->classes[$name]);
+            unset ($this->classMap[$name]);
         } else {
-            $this->classes[$name] = $this->dependencies;
-            $this->classMap[$name] = $this->file;
+            $this->classMap[$name] = $this->dependencies;
         }
     }
 
@@ -131,31 +125,10 @@ class Collector extends NodeVisitorAbstract
     }
 
     /**
-     * @param string $file
-     */
-    public function bind($file)
-    {
-        $this->file = $file;
-    }
-
-    /**
-     * @param $class
-     * @return null|string
-     */
-    public function getFileBy($class)
-    {
-        if (array_key_exists($class, $this->classMap)) {
-            return $this->classMap[$class];
-        }
-
-        return null;
-    }
-
-    /**
      * @return array
      */
-    public function getClassDependencyMap()
+    public function getClassMap()
     {
-        return $this->classes;
+        return $this->classMap;
     }
 }
