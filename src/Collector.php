@@ -118,9 +118,11 @@ class Collector extends NodeVisitorAbstract
         } elseif ($node instanceof Node\Expr\Include_) {
             $this->hasFoundInvalidStmt = true;
         } elseif ($node instanceof Node\Expr\FuncCall) {
-            $function = $node->name->toString();
-            if (in_array($function, $this->invalidFunctions)) {
-                $this->hasFoundInvalidStmt = true;
+            if (method_exists($node->name, 'toString')) {
+                $function = $node->name->toString();
+                if (in_array($function, $this->invalidFunctions)) {
+                    $this->hasFoundInvalidStmt = true;
+                }
             }
         }
     }
