@@ -39,6 +39,9 @@ class Collector extends NodeVisitorAbstract
     /** @var Node\Stmt\ClassLike[] */
     private $foundClasses = array();
 
+    /** @var array */
+    private $uses = array();
+
     /** @var bool */
     private $hasFoundInvalidStmt = false;
 
@@ -115,6 +118,10 @@ class Collector extends NodeVisitorAbstract
             $this->foundClasses[] = $node;
         } elseif ($node instanceof Node\Stmt\TraitUse) {
             $this->collect($node->traits);
+        } elseif ($node instanceof Node\Stmt\UseUse) {
+            $this->uses[$node->name->toString()] = $node->alias;
+        } elseif ($node instanceof Node\Stmt\Declare_) {
+            $this->hasFoundInvalidStmt = true;
         } elseif ($node instanceof Node\Expr\Include_) {
             $this->hasFoundInvalidStmt = true;
         } elseif ($node instanceof Node\Expr\FuncCall) {
@@ -124,6 +131,14 @@ class Collector extends NodeVisitorAbstract
                     $this->hasFoundInvalidStmt = true;
                 }
             }
+        }
+
+        if ($node instanceof Node && $comment = $node->getDocComment()) {
+            $text = $comment->getText();
+            foreach ($this->uses as $namespace => $alias) {
+                $text = str_replace('@' . $alias, '@'. $namespace, $text);
+            }
+            $comment->setText($text);
         }
     }
 
