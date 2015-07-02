@@ -91,17 +91,10 @@ class Filter
     {
         foreach ($classMap as $class => $dependencies) {
             foreach ($dependencies as $index => $dependency) {
-                if (!$this->classloader->findFile($dependency)
-                    && (class_exists($dependency, false)
-                        || interface_exists($dependency, false)
-                        || trait_exists($dependency, false))
+                if (false === strpos($dependency, '_')
+                    && count(explode("\\", $dependency)) == 1
                 ) {
-                    set_error_handler(null);
-                    $reflectionClass = new \ReflectionClass($class);
-                    if ($reflectionClass->isInternal() || $reflectionClass->getExtensionName()) {
-                        unset($classMap[$class][$index]);
-                    }
-                    restore_error_handler();
+                    unset($classMap[$class][$index]);
                 }
             }
         }
@@ -117,9 +110,7 @@ class Filter
     {
         foreach ($classMap as $class => $dependencies) {
             foreach ($dependencies as $dependency) {
-                if (!isset($classMap[$dependency])
-                    || !$this->classloader->findFile($dependency)
-                ) {
+                if (!isset($classMap[$dependency])) {
                     unset($classMap[$class]);
                     $classMap = $this->removeUnloadableClassesFrom($classMap);
                     break 2;
@@ -138,7 +129,7 @@ class Filter
     {
         $classes = array_keys($classMap);
 
-        set_error_handler(null);
+        set_error_handler(function(){});
         foreach ($classes as $class) {
             class_exists($class, true);
         }
