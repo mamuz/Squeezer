@@ -98,11 +98,7 @@ class Collector extends NodeVisitorAbstract
             $name = $name->toString();
         }
 
-        if (array_key_exists($name, $this->classMap)) {
-            unset ($this->classMap[$name]);
-        } else {
-            $this->classMap[$name] = $this->dependencies;
-        }
+        $this->classMap[$name] = $this->dependencies;
     }
 
     /**
