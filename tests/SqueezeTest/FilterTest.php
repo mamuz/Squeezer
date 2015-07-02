@@ -41,18 +41,27 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     /** @var \Squeeze\Collector | \Mockery\MockInterface */
     protected $collector;
 
+    /** @var \Composer\Autoload\ClassLoader | \Mockery\MockInterface */
+    protected $classLoader;
+
     protected function setUp()
     {
         $this->parser = \Mockery::mock('PhpParser\ParserAbstract');
         $this->traverser = \Mockery::mock('PhpParser\NodeTraverser');
         $this->collector = \Mockery::mock('Squeeze\Collector');
+        $this->classLoader = \Mockery::mock('Composer\Autoload\ClassLoader');
 
-        $this->fixture = new Filter($this->parser, $this->traverser, $this->collector);
+        $this->fixture = new Filter(
+            $this->parser,
+            $this->traverser,
+            $this->collector,
+            $this->classLoader
+        );
     }
 
     public function testExtractClassMap()
     {
-        $this->collector->shouldReceive('getClassDependencyMap')->once()->andReturn(array());
+        $this->collector->shouldReceive('getClassMap')->once()->andReturn(array());
 
         $iterator = \Mockery::mock('Iterator');
         $iterator->shouldIgnoreMissing();

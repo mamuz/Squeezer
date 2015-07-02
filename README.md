@@ -39,7 +39,8 @@ The recommended way to install
 - Validates availability of class dependencies.
 - Removing comments and docblocks is optional to keep interoperability to annotation parser.
 - PHP files with more than one class, interface or trait declarations will be skipped.
-- PHP files with `include`, `include_once`, `require` or `require_once` statements will be skipped
+- PHP files with `include`, `include_once`, `require` or `require_once` statements will be skipped.
+- PHP files with function calls to handle files like `fopen` or `mkdir`will be skipped.
 
 ## Usage
 
