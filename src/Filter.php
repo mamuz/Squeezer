@@ -132,7 +132,7 @@ class Filter
 
         set_error_handler(
             function ($code, $message, $file, $line) {
-                echo "[$code] $message on line $line in $file\n";
+                echo "\n[$code] $message on line $line in $file\n";
             }
         );
         foreach ($classes as $class) {
