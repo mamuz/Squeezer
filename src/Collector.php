@@ -33,7 +33,6 @@ class Collector extends NodeVisitorAbstract
     /** @var array */
     private $classMap = array();
 
-
     /** @var array */
     private $dependencies = array();
 
@@ -90,7 +89,7 @@ class Collector extends NodeVisitorAbstract
      */
     private function add(Node\Stmt\ClassLike $node)
     {
-        if ($this->findIncludeIn($node->stmts)) {
+        if ($this->findIncludeIn($node)) {
             return;
         }
 
@@ -110,14 +109,20 @@ class Collector extends NodeVisitorAbstract
      * @param Node[] $stmts
      * @return bool
      */
-    private function findIncludeIn(array $stmts)
+    private function findIncludeIn($stmts)
     {
         foreach ($stmts as $node) {
-            if ($node instanceof Node\Expr\Include_) {
-                return true;
+            if ($node instanceof Node) {
+                if ($node instanceof Node\Expr\Include_) {
+                    return true;
+                }
             }
-            if (property_exists($node, 'stmts') && is_array($node->stmts)) {
-                return $this->findIncludeIn($node->stmts);
+            if (is_array($node)) {
+                foreach ($node as $value) {
+                    if ($this->findIncludeIn($value)) {
+                        return true;
+                    }
+                }
             }
         }
 
