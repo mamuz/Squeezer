@@ -133,7 +133,7 @@ class Filter
     {
         $classes = array_keys($classMap);
 
-        set_error_handler(null);
+        set_error_handler(function($code, $message, $file, $line){});
         foreach ($classes as $class) {
             class_exists($class, true);
         }
