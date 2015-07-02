@@ -2,7 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## v0.1.2 - UNRELEASED
-Nothing yet.
+### Added
+- Declare stmt finder
 @todo Adapt namespace aliases to annotation to keep annotationparser alive
 
 ## v0.1.1 - 2015-07-02
