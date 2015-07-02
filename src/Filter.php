@@ -136,7 +136,7 @@ class Filter
     {
         $classes = array_keys($classMap);
 
-        set_error_handler(function($code, $message, $file, $line){});
+        set_error_handler(null);
         foreach ($classes as $class) {
             class_exists($class, true);
         }
