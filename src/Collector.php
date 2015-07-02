@@ -115,10 +115,8 @@ class Collector extends NodeVisitorAbstract
                     }
                 }
                 if (is_array($node)) {
-                    foreach ($node as $value) {
-                        if ($this->findIncludeIn($value)) {
-                            return true;
-                        }
+                    if ($this->findIncludeIn($node)) {
+                        return true;
                     }
                 }
             }
