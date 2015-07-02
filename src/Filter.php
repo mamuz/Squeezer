@@ -91,7 +91,11 @@ class Filter
     {
         foreach ($classMap as $class => $dependencies) {
             foreach ($dependencies as $index => $dependency) {
-                if (!$this->classloader->findFile($dependency)) {
+                if (!$this->classloader->findFile($dependency)
+                    && (class_exists($dependency, false)
+                        || interface_exists($dependency, false)
+                        || trait_exists($dependency, false))
+                ) {
                     $reflectionClass = new \ReflectionClass($class);
                     if ($reflectionClass->isInternal() || $reflectionClass->getExtensionName()) {
                         unset($classMap[$class][$index]);
