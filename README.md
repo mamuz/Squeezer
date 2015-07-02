@@ -16,7 +16,7 @@ Squeezer is a minifier for php class files.
 It will parse your directories to find valid classes, interfaces and traits and squeeze them to one file.
 Autoloading in php is quite nice but also expensive. Sometimes too expensive for production.
 Using a minified file reduces the execution time of your application but increases the memory usage.
-Take care which directories or packages you want to squeeze. For production you should only squeeze.
+Take care which directories or packages you want to squeeze. For production you should only squeeze
 used packages.
 
 ## Installation
