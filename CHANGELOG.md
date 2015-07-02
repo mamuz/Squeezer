@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Sort namespaces
 - Global namespace prepending
+- IncludeStmt finder
 
 ### Changed
 - Improve synopsis

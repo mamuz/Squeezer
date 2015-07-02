@@ -134,8 +134,7 @@ class Collector extends NodeVisitorAbstract
     /**
      * @return array
      */
-    public
-    function getClassMap()
+    public function getClassMap()
     {
         return $this->classMap;
     }
