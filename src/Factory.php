@@ -59,8 +59,10 @@ class Factory
         $filterTraverser->addVisitor(new \PhpParser\NodeVisitor\NameResolver);
         $filterTraverser->addVisitor($collector);
 
+        $writerTraverser = new \PhpParser\NodeTraverser;
+        $writerTraverser->addVisitor(new Convertor);
         $filter = new Filter($parser, $filterTraverser, $collector, $loader);
-        $writer = new Writer($parser, new \PhpParser\NodeTraverser, new Printer);
+        $writer = new Writer($parser, $writerTraverser, new Printer);
 
         $finder = new Finder;
         $finder->files()->name('*.php');
