@@ -28,7 +28,7 @@ namespace Squeeze;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class Convertor extends NodeVisitorAbstract
+class Converter extends NodeVisitorAbstract
 {
     /** @var array */
     private $uses = array();

@@ -60,7 +60,7 @@ class Factory
         $filterTraverser->addVisitor($collector);
 
         $writerTraverser = new \PhpParser\NodeTraverser;
-        $writerTraverser->addVisitor(new Convertor);
+        $writerTraverser->addVisitor(new Converter);
         $filter = new Filter($parser, $filterTraverser, $collector, $loader);
         $writer = new Writer($parser, $writerTraverser, new Printer);
 

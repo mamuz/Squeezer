@@ -1,10 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## v0.1.2 - UNRELEASED
+## v0.1.3 - UNRELEASED
+Nothing yet.
+
+## v0.1.2 - 2015-07-05
 ### Added
 - Declare stmt finder
-@todo Adapt namespace aliases to annotation to keep annotationparser alive
+
+### Fixed
+Interoperability to annotation parser
 
 ## v0.1.1 - 2015-07-02
 ### Added
