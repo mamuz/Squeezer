@@ -69,12 +69,5 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $classMap = $this->fixture->extractClassMapFrom($iterator);
 
         $this->assertEmpty($classMap);
-        
-        $classIncludes = array_merge(
-            get_declared_interfaces(),
-            get_declared_traits(),
-            get_declared_classes()
-        );
-        print_r($classIncludes);
     }
 }
