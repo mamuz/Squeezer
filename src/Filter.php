@@ -127,15 +127,15 @@ class Filter
     }
 
     /**
-     * @param array $nodeids
+     * @param array $nodeIds
      * @param array $edges
      * @return array
      */
-    private function topologicalSort(array $nodeids, array $edges)
+    private function topologicalSort(array $nodeIds, array $edges)
     {
         $sorted = $edgelessNodes = $nodes = array();
 
-        foreach ($nodeids as $id) {
+        foreach ($nodeIds as $id) {
             $nodes[$id] = array('in' => array(), 'out' => array());
             foreach ($edges as $edge) {
                 if ($id == $edge[0]) {
