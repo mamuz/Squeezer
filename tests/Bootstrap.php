@@ -15,9 +15,3 @@ if (!isset($loader)) {
 $loader->add('SqueezeTest\\', __DIR__);
 
 unset($file, $loader);
-
-$binFile = './bin/squeeze';
-$minFile = './min.php';
-
-echo shell_exec($binFile . ' ' . $minFile . ' --source=src,vendor/symfony,vendor/doctrine,vendor/zendframework,vendor/widmogrod');
-echo shell_exec('php ' . $minFile);
