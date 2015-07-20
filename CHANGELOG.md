@@ -2,7 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## v0.1.3 - UNRELEASED
-Nothing yet.
+### Fixed
+- Sort namespaces php env independently
+
+### Added
+- DependencyMap
 
 ## v0.1.2 - 2015-07-05
 ### Added

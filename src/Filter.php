@@ -32,7 +32,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class Filter
 {
-
     /** @var ParserAbstract */
     private $parser;
 
@@ -77,28 +76,8 @@ class Filter
         }
 
         $classMap = $this->collector->getClassMap();
-        $classMap = $this->removeInternalClassesFrom($classMap);
         $classMap = $this->removeUnloadableClassesFrom($classMap);
         $classMap = $this->sort($classMap);
-
-        return $classMap;
-    }
-
-    /**
-     * @param array $classMap
-     * @return array
-     */
-    private function removeInternalClassesFrom(array $classMap)
-    {
-        foreach ($classMap as $class => $dependencies) {
-            foreach ($dependencies as $index => $dependency) {
-                if (false === strpos($dependency, '_')
-                    && count(explode("\\", $dependency)) == 1
-                ) {
-                    unset($classMap[$class][$index]);
-                }
-            }
-        }
 
         return $classMap;
     }
@@ -110,7 +89,8 @@ class Filter
     private function removeUnloadableClassesFrom(array $classMap)
     {
         foreach ($classMap as $class => $dependencies) {
-            foreach ($dependencies as $dependency) {
+            /** @var DependencyMap $dependencies */
+            foreach ($dependencies->getAll() as $dependency) {
                 if (!isset($classMap[$dependency])) {
                     unset($classMap[$class]);
                     $classMap = $this->removeUnloadableClassesFrom($classMap);
@@ -128,31 +108,33 @@ class Filter
      */
     private function sort(array $classMap)
     {
-        $classes = array_keys($classMap);
+        $classesSorted = array();
 
-        set_error_handler(
-            function ($code, $message, $file, $line) {
-                echo "[$code] on line $line in $file\n$message\n";
+        foreach ($classMap as $class => $dependencyMap) {
+            /** @var DependencyMap $dependencyMap */
+            if (!in_array($class, $classesSorted)) {
+                $classesSorted[] = $class;
             }
-        );
-        foreach ($classes as $class) {
-            class_exists($class, true);
+            foreach ($dependencyMap->getAll() as $dependency) {
+                $classPosition = array_search($class, $classesSorted);
+                $dependencyPosition = array_search($dependency, $classesSorted);
+                if (false !== $dependencyPosition) {
+                    if ($dependencyPosition < $classPosition) {
+                        continue;
+                    }
+                }
+                $before = array_slice($classesSorted, 0, $classPosition);
+                $after = array_slice($classesSorted, $classPosition, count($classesSorted));
+                $classesSorted = array_merge($before, array($dependency), $after);
+            }
         }
-        restore_error_handler();
-
-        $classIncludes = array_merge(
-            get_declared_interfaces(),
-            get_declared_traits(),
-            get_declared_classes()
-        );
 
         $classMap = array();
-        foreach ($classIncludes as $class) {
-            if (in_array($class, $classes)) {
-                $classMap[$class] = $this->classloader->findFile($class);
-            }
+        foreach ($classesSorted as $class) {
+            $classMap[$class] = $this->classloader->findFile($class);
         }
 
         return $classMap;
     }
+
 }
