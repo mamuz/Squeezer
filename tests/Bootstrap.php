@@ -19,5 +19,5 @@ unset($file, $loader);
 $binFile = __DIR__ . '/../bin/squeeze';
 $minFile = __DIR__ . '/../min.php';
 
-echo shell_exec($binFile . ' ' . $minFile . ' --source=../src,../vendor');
+echo shell_exec($binFile . ' ' . $minFile . ' --source=src,vendor');
 echo shell_exec('php ' . $minFile);
