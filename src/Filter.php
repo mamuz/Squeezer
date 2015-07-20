@@ -133,8 +133,6 @@ class Filter
             }
         }
 
-
         return $classesSorted;
     }
-
 }
