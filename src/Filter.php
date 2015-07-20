@@ -113,26 +113,57 @@ class Filter
      */
     private function sort(array $classMap)
     {
-        $classesSorted = array();
-
+        $edges = array();
         foreach ($classMap as $class => $dependencies) {
-            if (!in_array($class, $classesSorted)) {
-                $classesSorted[] = $class;
-            }
             foreach ($dependencies as $dependency) {
-                $classPosition = array_search($class, $classesSorted);
-                $dependencyPosition = array_search($dependency, $classesSorted);
-                if (false !== $dependencyPosition) {
-                    if ($dependencyPosition < $classPosition) {
-                        continue;
-                    }
-                }
-                $before = array_slice($classesSorted, 0, $classPosition);
-                $after = array_slice($classesSorted, $classPosition, count($classesSorted));
-                $classesSorted = array_merge($before, array($dependency), $after);
+                $edges[] = array($dependency, $class);
             }
         }
 
-        return $classesSorted;
+        return $this->topologicalSort(
+            array_keys($classMap),
+            $edges
+        );
+    }
+
+    /**
+     * @param array $nodeids
+     * @param array $edges
+     * @return array
+     */
+    private function topologicalSort(array $nodeids, array $edges)
+    {
+        $sorted = $edgelessNodes = $nodes = array();
+
+        foreach ($nodeids as $id) {
+            $nodes[$id] = array('in' => array(), 'out' => array());
+            foreach ($edges as $edge) {
+                if ($id == $edge[0]) {
+                    $nodes[$id]['out'][] = $edge[1];
+                }
+                if ($id == $edge[1]) {
+                    $nodes[$id]['in'][] = $edge[0];
+                }
+            }
+        }
+
+        foreach ($nodes as $id => $node) {
+            if (empty($node['in'])) {
+                $edgelessNodes[] = $id;
+            }
+        }
+
+        while (!empty($edgelessNodes)) {
+            $sorted[] = $id = array_shift($edgelessNodes);
+            foreach ($nodes[$id]['out'] as $out) {
+                $nodes[$out]['in'] = array_diff($nodes[$out]['in'], array($id));
+                if (empty($nodes[$out]['in'])) {
+                    $edgelessNodes[] = $out;
+                }
+            }
+            $nodes[$id]['out'] = array();
+        }
+
+        return $sorted;
     }
 }
