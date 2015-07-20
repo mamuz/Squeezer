@@ -9,7 +9,7 @@ Nothing yet.
 - Declare stmt finder
 
 ### Fixed
-Interoperability to annotation parser
+- Interoperability to annotation parser
 
 ## v0.1.1 - 2015-07-02
 ### Added
