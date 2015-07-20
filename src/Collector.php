@@ -33,8 +33,8 @@ class Collector extends NodeVisitorAbstract
     /** @var array */
     private $classMap = array();
 
-    /** @var DependencyMap */
-    private $dependencies;
+    /** @var array */
+    private $dependencies = array();
 
     /** @var Node\Stmt\ClassLike[] */
     private $foundClasses = array();
@@ -102,24 +102,19 @@ class Collector extends NodeVisitorAbstract
         'stream_is_local',
     );
 
-    public function __construct()
-    {
-        $this->dependencies = new DependencyMap;
-    }
-
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
-            $this->collect(array($node->extends), 'extension');
-            $this->collect($node->implements, 'implementation');
+            $this->collect(array($node->extends));
+            $this->collect($node->implements);
             $this->foundClasses[] = $node;
         } elseif ($node instanceof Node\Stmt\Interface_) {
-            $this->collect($node->extends, 'implementation');
+            $this->collect($node->extends);
             $this->foundClasses[] = $node;
         } elseif ($node instanceof Node\Stmt\Trait_) {
             $this->foundClasses[] = $node;
         } elseif ($node instanceof Node\Stmt\TraitUse) {
-            $this->collect($node->traits, 'traitUse');
+            $this->collect($node->traits);
         } elseif ($node instanceof Node\Stmt\Declare_) {
             $this->hasFoundInvalidStmt = true;
         } elseif ($node instanceof Node\Expr\Include_) {
@@ -136,9 +131,8 @@ class Collector extends NodeVisitorAbstract
 
     /**
      * @param Node\Name[]|null $names
-     * @param string           $type
      */
-    private function collect($names, $type)
+    private function collect($names)
     {
         if ($names) {
             foreach ($names as $name) {
@@ -149,8 +143,7 @@ class Collector extends NodeVisitorAbstract
                     ) {
                         continue;
                     }
-                    $method = 'add' . ucfirst($type);
-                    $this->dependencies->$method($name);
+                    $this->dependencies[$name] = $name;
                 }
             }
         }
@@ -169,7 +162,7 @@ class Collector extends NodeVisitorAbstract
             $this->classMap[$name] = $this->dependencies;
         }
 
-        $this->dependencies = new DependencyMap;
+        $this->dependencies = array();
         $this->foundClasses = array();
         $this->hasFoundInvalidStmt = false;
     }

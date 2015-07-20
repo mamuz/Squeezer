@@ -79,7 +79,13 @@ class Filter
         $classMap = $this->removeUnloadableClassesFrom($classMap);
         $classMap = $this->sort($classMap);
 
-        return $classMap;
+        $classFileMap = array();
+        foreach ($classMap as $class) {
+            $classFileMap[$class] = $this->classloader->findFile($class);
+        }
+
+
+        return $classFileMap;
     }
 
     /**
@@ -89,8 +95,7 @@ class Filter
     private function removeUnloadableClassesFrom(array $classMap)
     {
         foreach ($classMap as $class => $dependencies) {
-            /** @var DependencyMap $dependencies */
-            foreach ($dependencies->getAll() as $dependency) {
+            foreach ($dependencies as $dependency) {
                 if (!isset($classMap[$dependency])) {
                     unset($classMap[$class]);
                     $classMap = $this->removeUnloadableClassesFrom($classMap);
@@ -110,12 +115,11 @@ class Filter
     {
         $classesSorted = array();
 
-        foreach ($classMap as $class => $dependencyMap) {
-            /** @var DependencyMap $dependencyMap */
+        foreach ($classMap as $class => $dependencies) {
             if (!in_array($class, $classesSorted)) {
                 $classesSorted[] = $class;
             }
-            foreach ($dependencyMap->getAll() as $dependency) {
+            foreach ($dependencies as $dependency) {
                 $classPosition = array_search($class, $classesSorted);
                 $dependencyPosition = array_search($dependency, $classesSorted);
                 if (false !== $dependencyPosition) {
@@ -129,12 +133,8 @@ class Filter
             }
         }
 
-        $classMap = array();
-        foreach ($classesSorted as $class) {
-            $classMap[$class] = $this->classloader->findFile($class);
-        }
 
-        return $classMap;
+        return $classesSorted;
     }
 
 }
