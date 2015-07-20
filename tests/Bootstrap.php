@@ -16,5 +16,8 @@ $loader->add('SqueezeTest\\', __DIR__);
 
 unset($file, $loader);
 
-echo shell_exec(__DIR__ . '/../bin/squeeze min.php');
-echo shell_exec('php ' . __DIR__ . '/../min.php');
+$binFile = __DIR__ . '/../bin/squeeze';
+$minFile = __DIR__ . '/../min.php';
+
+echo shell_exec($binFile . ' ' . $minFile . ' --source=../src,../vendor');
+echo shell_exec('php ' . $minFile);
