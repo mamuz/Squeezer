@@ -95,8 +95,13 @@ class Filter
     private function removeUnloadableClassesFrom(array $classMap)
     {
         foreach ($classMap as $class => $dependencies) {
+            if (!$this->classloader->findFile($class)) {
+                unset($classMap[$class]);
+                $classMap = $this->removeUnloadableClassesFrom($classMap);
+                break;
+            }
             foreach ($dependencies as $dependency) {
-                if (!isset($classMap[$dependency])) {
+                if (!isset($classMap[$dependency]) || !$this->classloader->findFile($dependency)) {
                     unset($classMap[$class]);
                     $classMap = $this->removeUnloadableClassesFrom($classMap);
                     break 2;
