@@ -22,12 +22,35 @@
       <h1>
 <a id="squeezer" class="anchor" href="#squeezer" aria-hidden="true"><span class="octicon octicon-link"></span></a>Squeezer</h1>
 
+<p><a href="https://twitter.com/mamuz_de"><img src="http://img.shields.io/badge/author-@mamuz_de-blue.svg?style=flat-square" alt="Author"></a>
+<a href="https://travis-ci.org/mamuz/Squeezer"><img src="https://img.shields.io/travis/mamuz/Squeezer.svg?style=flat-square" alt="Build Status"></a>
+<a href="https://scrutinizer-ci.com/g/mamuz/Squeezer/code-structure"><img src="https://img.shields.io/scrutinizer/coverage/g/mamuz/Squeezer.svg?style=flat-square" alt="Coverage Status"></a>
+<a href="https://scrutinizer-ci.com/g/mamuz/Squeezer"><img src="https://img.shields.io/scrutinizer/g/mamuz/Squeezer.svg?style=flat-square" alt="Quality Score"></a>
+<a href="https://www.versioneye.com/user/projects/5592fdaf6238390018000001"><img src="https://img.shields.io/versioneye/d/user/projects/5592fdaf6238390018000001.svg?style=flat-square" alt="Dependency Status"></a></p>
+
+<p><a href="https://packagist.org/packages/mamuz/squeezer"><img src="https://img.shields.io/packagist/v/mamuz/squeezer.svg?style=flat-square" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/mamuz/squeezer"><img src="https://img.shields.io/packagist/dt/mamuz/squeezer.svg?style=flat-square" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/mamuz/squeezer"><img src="https://img.shields.io/packagist/l/mamuz/squeezer.svg?style=flat-square" alt="License"></a></p>
+
 <p>Squeezer is a minifier for php class files.
 It will parse your directories to find valid classes, interfaces and traits and squeeze them to one file.
 Autoloading in php is quite nice but also expensive. Sometimes too expensive for production.
 Using a minified file reduces the execution time of your application but increases the memory usage.
 Take care which directories or packages you want to squeeze. For production you should only squeeze
 used packages.</p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>The recommended way to install
+<a href="https://packagist.org/packages/mamuz/squeezer"><code>mamuz/squeezer</code></a> is through
+<a href="http://getcomposer.org/">composer</a> by adding dependency to your <code>composer.json</code>:</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>require-dev<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>mamuz/squeezer<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>0.*<span class="pl-pds">"</span></span>
+    }
+}</pre></div>
 
 <h2>
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
@@ -41,6 +64,28 @@ used packages.</p>
 <li>PHP files with function calls to handle files like <code>fopen</code> or <code>mkdir</code>will be skipped.</li>
 <li>PHP files with a <code>declare</code> statement will be skipped.</li>
 </ul>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Run this command line to squeeze your library without comments to <code>classes.min.php</code>:</p>
+
+<div class="highlight highlight-source-shell"><pre>./vendor/bin/squeeze classes.min.php --source=<span class="pl-s"><span class="pl-pds">"</span>module/*/src, vendor/zendframework/*/src<span class="pl-pds">"</span></span> --exclude=<span class="pl-s"><span class="pl-pds">"</span>zend-loader<span class="pl-pds">"</span></span> --nocomments</pre></div>
+
+<p><em>For instance, we are using a typical ZendFramework Application, but you can adapt this command to each environment</em></p>
+
+<p>After that you can include <code>classes.min.php</code> inside your <code>index.php</code>, but before loading composer autoloader.</p>
+
+<p>For instance...</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-c">//...</span></span>
+<span class="pl-s1"><span class="pl-k">include_once</span> <span class="pl-s"><span class="pl-pds">'</span>classes.min.php<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s1"><span class="pl-k">include_once</span> <span class="pl-s"><span class="pl-pds">'</span>vendor/autoload.php<span class="pl-pds">'</span></span>; <span class="pl-c">// composer autoloader</span></span>
+<span class="pl-s1"><span class="pl-c">//...</span></span></pre></div>
+
+<p>Use this command to get synopsis about all arguments</p>
+
+<div class="highlight highlight-source-shell"><pre>./vendor/bin/squeeze --help</pre></div>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/mamuz/Squeezer">Squeezer</a> is maintained by <a href="https://github.com/mamuz">mamuz</a>.</span>
