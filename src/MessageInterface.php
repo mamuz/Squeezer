@@ -27,7 +27,7 @@ namespace Squeeze;
 
 interface MessageInterface
 {
-    const VERSION = 'dev-master';
+    const VERSION = 'v0.2.1';
 
     const NAME = 'Squeezer';
 
@@ -40,7 +40,7 @@ interface MessageInterface
     const OPTION_SOURCE = 'Directories to squeeze (comma-separated)';
 
     const OPTION_EXCLUDE = 'Exclude directories from source (comma-separated)';
-    
+
     const OPTION_NOTNAME = 'Exclude files matching a pattern';
 
     const OPTION_NOCOMMENTS = 'Remove comments from code';

@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## v0.2.1 - 2016-02-03
+### Fixed
+- Support symfony3
+
 ## v0.2.0 - 2015-07-21
 ### Fixed
 - Sort namespaces fix by using topological sorting
