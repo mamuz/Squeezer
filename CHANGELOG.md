@@ -1,9 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## v0.1.3 - UNRELEASED
+## v0.2.0 - 2015-07-21
 ### Fixed
 - Sort namespaces fix by using topological sorting
+ 
+### Added
+- Notname argument to exclude files by matched pattern
 
 ## v0.1.2 - 2015-07-05
 ### Added

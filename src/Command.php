@@ -74,6 +74,7 @@ class Command extends BaseCommand
         $this->addArgument('target', InputArgument::REQUIRED, Message::ARGUMENT_TARGET);
         $this->addOption('source', 's', InputOption::VALUE_OPTIONAL, Message::OPTION_SOURCE, '.');
         $this->addOption('exclude', 'e', InputOption::VALUE_OPTIONAL, Message::OPTION_EXCLUDE);
+        $this->addOption('notname', 'f', InputOption::VALUE_OPTIONAL, Message::OPTION_NOTNAME);
         $this->addOption('nocomments', 'c', InputOption::VALUE_NONE, Message::OPTION_NOCOMMENTS);
 
     }
@@ -89,6 +90,10 @@ class Command extends BaseCommand
 
         $this->writer->setTarget($target);
         $this->finder->in($sources)->exclude($excludes);
+        
+        if ($notName = $input->getOption('notname')) {
+            $this->finder->notName($notName);
+        }
 
         $output->writeln(sprintf(Message::PROGRESS_FILTER, $this->finder->count()));
         $classMap = $this->filter->extractClassMapFrom($this->finder->getIterator());
